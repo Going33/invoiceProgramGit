@@ -9,6 +9,10 @@ public class Main {
 	windowApp test=	new windowApp(buyer, seller);
 //jak wyciagnac buyer,seller info
 	//test
+	if(true)
+	{
+		System.out.println("FYI");
+	}
 		if (test == null) { // check if object is null
 
 			System.out.println("NULL");
