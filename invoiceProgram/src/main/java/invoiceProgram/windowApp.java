@@ -133,7 +133,10 @@ public class windowApp extends JFrame implements ActionListener {
 		
 			try {
 			
-				
+				if(true)
+				{
+					System.out.println("FYI [2]");
+				}
 				message = "Confirmed. Successfully wrote to the file.";
 
 				// creating seller's object and displaying informations in the console
