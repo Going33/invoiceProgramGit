@@ -16,25 +16,16 @@ public class saveTextFile {
 	private	File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
 	private BufferedWriter bf;
 	private boolean flag;
+	
 	public void makeAFile(Map<String, String> allDataMap) {
 		
-//		//try_catch do alDATA
-//		try {
-//			if (allDataMap == null) {
-//				System.out.println("allDataMap == null");
-//			} else {
-//				System.out.println("allDataMap NOT null");
-//			}
-//		}
-
 		try {
 			//File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
-			// tworzenie pliku
-		//	BufferedWriter bf = null;
+			// creating new file
 			if (myObj.createNewFile()) {
 				System.out.println("File created: " + myObj.getName());
 
-				// zapis do pliku danych wprowadzonych przez uzytkownika
+				// write inputs to file 
 				try {
 					System.out.println("\n");
 					bf = new BufferedWriter(new FileWriter(myObj));
@@ -49,7 +40,7 @@ public class saveTextFile {
 					bf.flush();
 					bf.close();
 
-				} catch (IOException e) {
+				} catch (IOException e ) {
 					System.out.println("An error occurred.");
 					e.printStackTrace();
 				}
@@ -91,5 +82,13 @@ public class saveTextFile {
 		return flag;
 	}
 	
+	//TO_DO
+	public void checkIfAFIleIsAlreadyExisting(File file) throws IOException
+	{
+		if(myObj.exists())
+		{
+		System.out.println("PLIK ISTNIEJE");
+		}
+	}
 	}
 	
