@@ -15,7 +15,8 @@ public class saveTextFile {
 	// tworzenie pliku
 	private	File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
 	private BufferedWriter bf;
-	private boolean flag;
+	private boolean flagDelete;
+	private boolean flagCheck;
 	
 	public void makeAFile(Map<String, String> allDataMap) {
 		
@@ -74,22 +75,31 @@ public class saveTextFile {
 		
 		if (myObj.delete()) {
             System.out.println("File deleted successfully");
-            flag = true;
+            flagDelete = true;
         }
         else {
             System.out.println("Failed to delete the file");
-            flag = false;
+            flagDelete = false;
         }
-		return flag;
+		return flagDelete;
 	}
 	
-	//TO_DO
-	public void checkIfAFIleIsAlreadyExisting(File file) throws IOException
+
+	public boolean checkIfAFIleIsAlreadyExisting()
 	{
-		if(myObj.exists())
-		{
-		System.out.println("PLIK ISTNIEJE");
-		}
+	if(myObj.exists())
+	{
+		System.out.println("File already exists. Cannot create a new one.");
+		flagCheck = false;
+	}else {
+		System.out.println("Confirmed. Successfully wrote to the file.");
+		flagCheck = true;
 	}
+		return flagCheck;
+	}
+	
+	
+	
+	
 	}
 	

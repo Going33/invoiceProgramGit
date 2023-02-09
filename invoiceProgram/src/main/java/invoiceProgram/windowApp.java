@@ -132,18 +132,29 @@ public class windowApp extends JFrame implements ActionListener {
 		case "Confirm Data of Seller":
 
 			try {
-				message = "Confirmed. Successfully wrote to the file.";
-
-				// creating seller's object and displaying informations in the console
-
-				// v3.0
-				createAnInputObjectOfSeller(new SellerClass()).displayInInfos();
-
-				////write to txt file
+//TO_DO		
+////// it 's needed to create one method/class for Seller and Buyer to optimize a code
+///////////////////////////////////////////////TO_OPTIMIZE////////////////////////
+				//// write to txt file
 				saveTextFile testSave = new saveTextFile();
-				testSave.makeAFile(createAnInputObjectOfSeller(new SellerClass()).getMapSeller());
+
+				if (testSave.checkIfAFIleIsAlreadyExisting()) {
+
+					message = "Confirmed. Successfully wrote to the file.";
+
+					// creating seller's object and displaying informations in the console
+
+					// v3.0
+					createAnInputObjectOfSeller(new SellerClass()).displayInInfos();
+					testSave.makeAFile(createAnInputObjectOfSeller(new SellerClass()).getMapSeller());
+				} else {
+					message = "File already exists. Cannot create a new one.";
+				}
+
 				confirmButtonTop.setEnabled(false);
 				clearButtonTop.setEnabled(true);
+
+///////////////////////////////////////////////TO_OPTIMIZE////////////////////////
 			} catch (Exception e1) {
 				// cleanUp();
 				e1.printStackTrace();
@@ -151,57 +162,70 @@ public class windowApp extends JFrame implements ActionListener {
 
 			}
 
-					
-			//checking if JLabel is null,needed to avoid "trash-old" message
+			// checking if JLabel is null,needed to avoid "trash-old" message
 			if (!checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop)) {
-				
+
 				// delete existing "delete" JLabel
 				windowPanelTop.remove(confirmedOrErrorTop);
-				//System.out.println("Stan tryFlag remove_If: "+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
+				// System.out.println("Stan tryFlag remove_If: "+
+				// checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
 
 			}
 			// creating JLabel for the confirm message
-			confirmedOrErrorTop=doTheJLabel(confirmedOrErrorTop,windowPanelTop,message);
-			
+			confirmedOrErrorTop = doTheJLabel(confirmedOrErrorTop, windowPanelTop, message);
+
 			System.out.println("Data of Seller Confirmed");
-			//System.out.println("Stan tryFlag new JLabel()_If: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
+			// System.out.println("Stan tryFlag new JLabel()_If: " +
+			// checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
 			break;
 
 		case "Confirm Data of Buyer":
 			System.out.println(" ");
 			try {
 
-				message = "Confirmed. Successfully wrote to the file.";
-
-				createAnInputObjectOfBuyer(new BuyerClass()).displayInInfos();
+				// TO_DO
+				////// it 's needed to create one method/class for Seller and Buyer to optimize
+				////// a code
+/////////////////////////////////////////////// TO_OPTIMIZE////////////////////////
 				//// write to txt file
 				saveTextFile testSave = new saveTextFile();
-				testSave.makeAFile(createAnInputObjectOfBuyer(new BuyerClass()).getMapBuyer());
-				////
+
+				if (testSave.checkIfAFIleIsAlreadyExisting()) {
+
+					message = "Confirmed. Successfully wrote to the file.";
+
+					// creating seller's object and displaying informations in the console
+
+					// v3.0
+					createAnInputObjectOfBuyer(new BuyerClass()).displayInInfos();
+					testSave.makeAFile(createAnInputObjectOfBuyer(new BuyerClass()).getMapBuyer());
+				} else {
+					message = "File already exists. Cannot create a new one.";
+				}
 
 				confirmButtonBottom.setEnabled(false);
 				clearButtonBottom.setEnabled(true);
+
+				/////////////////////////////////////////////// TO_OPTIMIZE////////////////////////
+
 			} catch (Exception e1) {
 				// cleanUp();
 				e1.printStackTrace();
 				message = "Error";
 
 			}
-			//System.out.println("Stan tryFlag przed if_bottom: " + tryFLag);
-			
-			//checking if JLabel is null,needed to avoid "trash-old" message
+
+			// checking if JLabel is null,needed to avoid "trash-old" message
 			if (!checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorBottom, windowPanelBottom)) {
-				
+
 				// delete existing "delete" JLabel
 				windowPanelBottom.remove(confirmedOrErrorBottom);
-			//	System.out.println("Stan tryFlag remove_If_bottom: "+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorBottom, windowPanelBottom));
-
+				
 			}
 			// creating JLabel for the confirm message
-			confirmedOrErrorBottom=doTheJLabel(confirmedOrErrorBottom,windowPanelBottom,message);
-			
+			confirmedOrErrorBottom = doTheJLabel(confirmedOrErrorBottom, windowPanelBottom, message);
+
 			System.out.println("Data of Seller Confirmed");
-			//System.out.println("Stan tryFlag new JLabel()_If: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
 			break;
 
 		case "Clear Data of Seller":
@@ -216,25 +240,23 @@ public class windowApp extends JFrame implements ActionListener {
 			}
 
 			// creating JLabel for the delete message
-			confirmedOrErrorTop=doTheJLabel(confirmedOrErrorTop,windowPanelTop,deleteExistingFile(new saveTextFile(), false));
-			
+			confirmedOrErrorTop = doTheJLabel(confirmedOrErrorTop, windowPanelTop,
+					deleteExistingFile(new saveTextFile(), false));
+
 			System.out.println("Clear Data of Seller");
-			//System.out.println("Stan tryFlag czyszczenie: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
 			break;
 
 		case "Clear Data of Buyer":
 			// delete existing "confirm" JLabel
-						if (!checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorBottom, windowPanelBottom)) {
+			if (!checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorBottom, windowPanelBottom)) {
 
-							windowPanelBottom.remove(confirmedOrErrorBottom);
-							cleanUp(windowPanelBottom, confirmedOrErrorBottom, confirmButtonBottom, clearButtonBottom);
-						}
+				windowPanelBottom.remove(confirmedOrErrorBottom);
+				cleanUp(windowPanelBottom, confirmedOrErrorBottom, confirmButtonBottom, clearButtonBottom);
+			}
 
-						// creating JLabel for the delete message
-						confirmedOrErrorBottom=doTheJLabel(confirmedOrErrorBottom,windowPanelBottom,deleteExistingFile(new saveTextFile(), false));
-						
-						
-					//	System.out.println("Stan tryFlag czyszczenie_bottom: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorBottom, windowPanelBottom));
+			// creating JLabel for the delete message
+			confirmedOrErrorBottom = doTheJLabel(confirmedOrErrorBottom, windowPanelBottom,
+					deleteExistingFile(new saveTextFile(), false));
 			System.out.println("Clear Data of Buyer");
 			break;
 
@@ -340,15 +362,14 @@ public class windowApp extends JFrame implements ActionListener {
 			// maybe better option is to create a list of each new field
 		}
 	}
-	
-	public JLabel doTheJLabel(JLabel confirmedOrError, JPanel windowPanel, String message )
-	{
+
+	public JLabel doTheJLabel(JLabel confirmedOrError, JPanel windowPanel, String message) {
 		confirmedOrError = new JLabel();
 		windowPanel.add(confirmedOrError);
 		confirmedOrError.setText(message);
 		return confirmedOrError;
 	}
-	
+
 	public static void repaintFrame() {
 		windowFrame.invalidate();
 		windowFrame.validate();
@@ -359,7 +380,7 @@ public class windowApp extends JFrame implements ActionListener {
 
 		// confirmedOrError.setText(" ");
 		// confirmedOrError =null;
-		 panelToClean.remove(confirmedOrError);
+		panelToClean.remove(confirmedOrError);
 		for (int i = 0; i <= 10; i++) {
 			System.out.println(" ");
 		}
@@ -374,24 +395,10 @@ public class windowApp extends JFrame implements ActionListener {
 
 		BtnConfirm.setEnabled(true);
 		BtnClear.setEnabled(false);
-		
+
 	}
 
-	//test method
-	public boolean checkIfJLabelConfirmedOrErrorIsNull(JLabel confirmedOrError, JPanel windowPanel) {
-		boolean flaghelp;
-		if (confirmedOrError != null) {
-			//System.out.println("Confirmed NOT NULL");
-			flaghelp = false;
-		} else {
-
-			//System.out.println("Confirmed IS NULL");
-			flaghelp = true;
-
-		}
-		return flaghelp;
-	}
-
+////////////////////////////////ADDITIONAL FILE OPERATIONS//////////////////////////////////
 	public String deleteExistingFile(saveTextFile deleteFile, boolean flagAppWindow) {
 
 		// saveTextFile deleteSeller = new saveTextFile();
@@ -404,7 +411,20 @@ public class windowApp extends JFrame implements ActionListener {
 		}
 		return message;
 	}
-	
 
+////////////////////////////////TEST METHODS//////////////////////////////////
+	public boolean checkIfJLabelConfirmedOrErrorIsNull(JLabel confirmedOrError, JPanel windowPanel) {
+		boolean flaghelp;
+		if (confirmedOrError != null) {
+			// System.out.println("Confirmed NOT NULL");
+			flaghelp = false;
+		} else {
+
+			// System.out.println("Confirmed IS NULL");
+			flaghelp = true;
+
+		}
+		return flaghelp;
+	}
 
 }
