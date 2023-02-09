@@ -151,21 +151,20 @@ public class windowApp extends JFrame implements ActionListener {
 
 			}
 
-			System.out.println("Stan tryFlag przed if: " + tryFLag);
-			
+					
 			//checking if JLabel is null,needed to avoid "trash-old" message
 			if (!checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop)) {
 				
 				// delete existing "delete" JLabel
 				windowPanelTop.remove(confirmedOrErrorTop);
-				System.out.println("Stan tryFlag remove_If: "+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
+				//System.out.println("Stan tryFlag remove_If: "+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
 
 			}
 			// creating JLabel for the confirm message
 			confirmedOrErrorTop=doTheJLabel(confirmedOrErrorTop,windowPanelTop,message);
 			
 			System.out.println("Data of Seller Confirmed");
-			System.out.println("Stan tryFlag new JLabel()_If: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
+			//System.out.println("Stan tryFlag new JLabel()_If: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
 			break;
 
 		case "Confirm Data of Buyer":
@@ -188,21 +187,21 @@ public class windowApp extends JFrame implements ActionListener {
 				message = "Error";
 
 			}
-			System.out.println("Stan tryFlag przed if_bottom: " + tryFLag);
+			//System.out.println("Stan tryFlag przed if_bottom: " + tryFLag);
 			
 			//checking if JLabel is null,needed to avoid "trash-old" message
 			if (!checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorBottom, windowPanelBottom)) {
 				
 				// delete existing "delete" JLabel
 				windowPanelBottom.remove(confirmedOrErrorBottom);
-				System.out.println("Stan tryFlag remove_If_bottom: "+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorBottom, windowPanelBottom));
+			//	System.out.println("Stan tryFlag remove_If_bottom: "+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorBottom, windowPanelBottom));
 
 			}
 			// creating JLabel for the confirm message
 			confirmedOrErrorBottom=doTheJLabel(confirmedOrErrorBottom,windowPanelBottom,message);
 			
 			System.out.println("Data of Seller Confirmed");
-			System.out.println("Stan tryFlag new JLabel()_If: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
+			//System.out.println("Stan tryFlag new JLabel()_If: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
 			break;
 
 		case "Clear Data of Seller":
@@ -220,7 +219,7 @@ public class windowApp extends JFrame implements ActionListener {
 			confirmedOrErrorTop=doTheJLabel(confirmedOrErrorTop,windowPanelTop,deleteExistingFile(new saveTextFile(), false));
 			
 			System.out.println("Clear Data of Seller");
-			System.out.println("Stan tryFlag czyszczenie: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
+			//System.out.println("Stan tryFlag czyszczenie: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
 			break;
 
 		case "Clear Data of Buyer":
@@ -234,8 +233,8 @@ public class windowApp extends JFrame implements ActionListener {
 						// creating JLabel for the delete message
 						confirmedOrErrorBottom=doTheJLabel(confirmedOrErrorBottom,windowPanelBottom,deleteExistingFile(new saveTextFile(), false));
 						
-						System.out.println("Clear Data of Seller");
-						System.out.println("Stan tryFlag czyszczenie_bottom: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorBottom, windowPanelBottom));
+						
+					//	System.out.println("Stan tryFlag czyszczenie_bottom: "	+ checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorBottom, windowPanelBottom));
 			System.out.println("Clear Data of Buyer");
 			break;
 
@@ -361,7 +360,7 @@ public class windowApp extends JFrame implements ActionListener {
 		// confirmedOrError.setText(" ");
 		// confirmedOrError =null;
 		 panelToClean.remove(confirmedOrError);
-		for (int i = 0; i <= 5; i++) {
+		for (int i = 0; i <= 10; i++) {
 			System.out.println(" ");
 		}
 
@@ -382,12 +381,11 @@ public class windowApp extends JFrame implements ActionListener {
 	public boolean checkIfJLabelConfirmedOrErrorIsNull(JLabel confirmedOrError, JPanel windowPanel) {
 		boolean flaghelp;
 		if (confirmedOrError != null) {
-			System.out.println("Confirmed NOT NULL");
-			// windowPanel.remove(confirmedOrError);
+			//System.out.println("Confirmed NOT NULL");
 			flaghelp = false;
 		} else {
 
-			System.out.println("Confirmed IS NULL");
+			//System.out.println("Confirmed IS NULL");
 			flaghelp = true;
 
 		}

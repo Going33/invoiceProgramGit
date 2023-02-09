@@ -19,6 +19,7 @@ public class saveTextFile {
 	
 	public void makeAFile(Map<String, String> allDataMap) {
 		
+		
 		try {
 			//File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
 			// creating new file
