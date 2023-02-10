@@ -13,47 +13,33 @@ import java.util.Scanner;
 public class saveTextFile {
 
 	// tworzenie pliku
-	private	File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
+	private File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
 	private BufferedWriter bf;
 	private boolean flagDelete;
 	private boolean flagCheck;
-	
+
 	public void makeAFile(Map<String, String> allDataMap) {
-		
-		
+
 		try {
-			//File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
+			// File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
 			// creating new file
 			if (myObj.createNewFile()) {
 				System.out.println("File created: " + myObj.getName());
 
-				// write inputs to file 
-				try {
-					System.out.println("\n");
-					bf = new BufferedWriter(new FileWriter(myObj));
 				
-					for (Map.Entry<String, String> set : allDataMap.entrySet()) {
-						// put key and value separated by a colon
-						bf.write(set.getKey() + " " + set.getValue());
-						bf.newLine();
-						//System.out.println("Successfully wrote to the file.");
-					}
+				// create a file
+				createAFile(allDataMap);
 
-					bf.flush();
-					bf.close();
-
-				} catch (IOException e ) {
-					System.out.println("An error occurred.");
-					e.printStackTrace();
-				}
-
-				// odczyt pliku
+				
+				
+				
+				// read a file
 				try {
 					// File myObj1 = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
 					Scanner myReader = new Scanner(myObj);
 					while (myReader.hasNextLine()) {
 						String data = myReader.nextLine();
-						//System.out.println(data);
+						// System.out.println(data);
 					}
 					myReader.close();
 				} catch (FileNotFoundException e) {
@@ -71,35 +57,51 @@ public class saveTextFile {
 
 	}
 
+	public void createAFile(Object object) {
+		// write inputs to file
+		try {
+			System.out.println("\n");
+			bf = new BufferedWriter(new FileWriter(myObj));
+
+			for (Map.Entry<String, String> set : ((Map<String, String>) object).entrySet()) {
+				// put key and value separated by a colon
+				bf.write(set.getKey() + " " + set.getValue());
+				bf.newLine();
+				// System.out.println("Successfully wrote to the file.");
+			}
+
+			bf.flush();
+			bf.close();
+
+		} catch (IOException e) {
+			System.out.println("An error occurred.");
+			e.printStackTrace();
+		}
+	}
+
 	public boolean deleteAFIle() {
-		
+
 		if (myObj.delete()) {
-            System.out.println("File deleted successfully");
-            flagDelete = true;
-        }
-        else {
-            System.out.println("Failed to delete the file");
-            flagDelete = false;
-        }
+			System.out.println("File deleted successfully");
+			flagDelete = true;
+		} else {
+			System.out.println("Failed to delete the file");
+			flagDelete = false;
+		}
 		return flagDelete;
 	}
-	
 
-	public boolean checkIfAFIleIsAlreadyExisting()
-	{
-	if(myObj.exists())
-	{
-		System.out.println("File already exists. Cannot create a new one.");
-		flagCheck = false;
-	}else {
-		System.out.println("Confirmed. Successfully wrote to the file.");
-		flagCheck = true;
-	}
+	
+	//////TEST_METHOD///////
+	public boolean checkIfAFIleIsAlreadyExisting() {
+		if (myObj.exists()) {
+			System.out.println("File already exists. Cannot create a new one.");
+			flagCheck = false;
+		} else {
+			System.out.println("Confirmed. Successfully wrote to the file.");
+			flagCheck = true;
+		}
 		return flagCheck;
 	}
-	
-	
-	
-	
-	}
-	
+
+}

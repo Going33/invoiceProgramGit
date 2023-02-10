@@ -241,7 +241,7 @@ public class windowApp extends JFrame implements ActionListener {
 
 			// creating JLabel for the delete message
 			confirmedOrErrorTop = doTheJLabel(confirmedOrErrorTop, windowPanelTop,
-					deleteExistingFile(new saveTextFile(), false));
+					deleteExistingFileGUI(new saveTextFile(), false));
 
 			System.out.println("Clear Data of Seller");
 			break;
@@ -256,7 +256,7 @@ public class windowApp extends JFrame implements ActionListener {
 
 			// creating JLabel for the delete message
 			confirmedOrErrorBottom = doTheJLabel(confirmedOrErrorBottom, windowPanelBottom,
-					deleteExistingFile(new saveTextFile(), false));
+					deleteExistingFileGUI(new saveTextFile(), false));
 			System.out.println("Clear Data of Buyer");
 			break;
 
@@ -399,7 +399,7 @@ public class windowApp extends JFrame implements ActionListener {
 	}
 
 ////////////////////////////////ADDITIONAL FILE OPERATIONS//////////////////////////////////
-	public String deleteExistingFile(saveTextFile deleteFile, boolean flagAppWindow) {
+	public String deleteExistingFileGUI(saveTextFile deleteFile, boolean flagAppWindow) {
 
 		// saveTextFile deleteSeller = new saveTextFile();
 		// boolean flagAppWindow = false;
