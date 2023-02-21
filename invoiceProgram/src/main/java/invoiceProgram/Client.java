@@ -15,7 +15,7 @@ public class Client implements invoiceParticipantsInterface {
 	
 	//////////
 	
-	public Map<String, String> getMapBuyer()
+	public Map<String, String> getClientMap()
 	{
 		return this.ClientMap;
 	}

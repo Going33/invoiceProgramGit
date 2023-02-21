@@ -69,8 +69,9 @@ public class windowApp extends JFrame implements ActionListener {
 		windowPanelTop = new JPanel(new GridLayout(rowTop, collTop, 0, 0));
 		windowPanelTop.setBackground(Color.WHITE);
 
-		addInfosToThePanelTop();
-
+		//addInfosToThePanelTop();
+		addInfosToThePanel(windowPanelTop,sellerInfo.size(),true);
+		
 		confirmButtonTop = new JButton("Confirm Data of Seller");
 		clearButtonTop = new JButton("Clear Data of Seller");
 
@@ -88,8 +89,9 @@ public class windowApp extends JFrame implements ActionListener {
 		windowPanelBottom = new JPanel(new GridLayout(rowBottom, collBottom, 0, 0));
 		windowPanelBottom.setBackground(Color.GRAY);
 
-		addInfosToThePanelBottom();
-
+		//addInfosToThePanelBottom();
+		addInfosToThePanel(windowPanelBottom,buyerInfo.size(),false);
+		
 		confirmButtonBottom = new JButton("Confirm Data of Buyer");
 		clearButtonBottom = new JButton("Clear Data of Buyer");
 
@@ -145,8 +147,10 @@ public class windowApp extends JFrame implements ActionListener {
 					// creating seller's object and displaying informations in the console
 
 					// v3.0
-					createAnInputObjectOfSeller(new SellerClass()).displayInInfos();
-					testSave.makeAFile(createAnInputObjectOfSeller(new SellerClass()).getMapSeller());
+					//createAnInputObjectOfSeller(new SellerClass()).displayInInfos();
+					// v4.0 t as an argument - seller
+					createAnInputClientObject(new Client(), windowPanelTop,true).displayInInfos();
+					testSave.makeAFile(createAnInputClientObject(new Client(), windowPanelTop,true).getClientMap());
 				} else {
 					message = "File already exists. Cannot create a new one.";
 				}
@@ -197,8 +201,11 @@ public class windowApp extends JFrame implements ActionListener {
 					// creating seller's object and displaying informations in the console
 
 					// v3.0
-					createAnInputObjectOfBuyer(new BuyerClass()).displayInInfos();
-					testSave.makeAFile(createAnInputObjectOfBuyer(new BuyerClass()).getMapBuyer());
+					//createAnInputObjectOfBuyer(new BuyerClass()).displayInInfos();
+					// v4.0 false as an argument - buyer
+					createAnInputClientObject(new Client(), windowPanelBottom,false).displayInInfos();
+				//testSave.makeAFile(createAnInputObjectOfBuyer(new BuyerClass()).getMapBuyer());
+					testSave.makeAFile(createAnInputClientObject(new Client(), windowPanelBottom,false).getClientMap());
 				} else {
 					message = "File already exists. Cannot create a new one.";
 				}
@@ -225,7 +232,7 @@ public class windowApp extends JFrame implements ActionListener {
 			// creating JLabel for the confirm message
 			confirmedOrErrorBottom = doTheJLabel(confirmedOrErrorBottom, windowPanelBottom, message);
 
-			System.out.println("Data of Seller Confirmed");
+			System.out.println("Data of Buyer Confirmed");
 			break;
 
 		case "Clear Data of Seller":
@@ -270,98 +277,66 @@ public class windowApp extends JFrame implements ActionListener {
 
 	//////////////////////////////// Objects//////////////////////////////////
 
-	//////// creating specific Object - Seller////////////////
-	public SellerClass createAnInputObjectOfSeller(SellerClass sellerInInfos) {
-		// SellerClass sellerInInfos = new SellerClass();
 
-		///////////////// iterate through Jpanel
-		/// https://stackoverflow.com/questions/1037139/loop-through-jpanel
-		int z = 0;
-		int k = 0;
-		sellerInInfos.clearTreeMap();
-		for (Component c : windowPanelTop.getComponents()) {
+////////creating specific Object - Client (Seller or Buyer) ////////////////
+public Client createAnInputClientObject(Client clientInInfos,JPanel windowPanel, boolean clientchoice)
+{
+	// SellerClass sellerInInfos = new SellerClass();
 
-			if (c instanceof JTextField) {
-				((JTextField) c).getText();
+	///////////////// iterate through Jpanel
+	/// https://stackoverflow.com/questions/1037139/loop-through-jpanel
+	int z = 0;
+	int k = 0;
+	clientInInfos.clearTreeMap();
+	for (Component c : windowPanel.getComponents()) {
 
-				if (z % 2 != 0) {
-					// System.out.println(z);
-					// add to HASHMAP Object
-					sellerInInfos.putInInfos(takeElementsOfSellerFromTheInnerList(k).toString(),
-							((JTextField) c).getText());
-					k = k + 1;
-				}
+		if (c instanceof JTextField) {
+			((JTextField) c).getText();
 
+			if (z % 2 != 0) {
+				// System.out.println(z);
+				// add to HASHMAP Object
+				clientInInfos.putInInfos(takeElementsOfClientFromTheInnerList(k, clientchoice).toString(),
+						((JTextField) c).getText());
+				k = k + 1;
 			}
-			z++;
 
 		}
-		// sellerInInfos.displayInInfos();
+		z++;
 
-		return sellerInInfos;
 	}
 
-	//////// creating specific Object - Buyer////////////////
-	public BuyerClass createAnInputObjectOfBuyer(BuyerClass buyerInInfos) {
-		// BuyerClass buyerInInfos = new BuyerClass();
 
-		///////////////// iterate through Jpanel
-		/// https://stackoverflow.com/questions/1037139/loop-through-jpanel
-		int z = 0;
-		int k = 0;
-		buyerInInfos.clearTreeMap();
-		for (Component c : windowPanelBottom.getComponents()) {
+	return clientInInfos;
+}
+	
 
-			if (c instanceof JTextField) {
-				((JTextField) c).getText();
 
-				if (z % 2 != 0) {
-					// System.out.println(z);
-					// add to HASHMAP Object
-					buyerInInfos.putInInfos(takeElementsOfSellerFromTheInnerList(k).toString(),
-							((JTextField) c).getText());
-					k = k + 1;
+//////////////////////////////// GUI//////////////////////////////////
 
-				}
-			}
-			z++;
+////////getting and adding names of fields////////////////
+	String takeElementsOfClientFromTheInnerList(int i,boolean clientchoice) {
 
+		String elementsOfListClientInfo = " ";
+		if(clientchoice)
+		{
+			elementsOfListClientInfo = sellerInfo.elements(i);
+		}else
+		{
+			elementsOfListClientInfo = buyerInfo.elements(i);
 		}
-		// buyerInInfos.displayInInfos();
-
-		return buyerInInfos;
+		return elementsOfListClientInfo;
 	}
+	
 
-	//////////////////////////////// GUI//////////////////////////////////
-
-	//////// getting and adding names of fields////////////////
-	String takeElementsOfSellerFromTheInnerList(int i) {
-
-		String elementsOfListSellerInfo = " ";
-		return elementsOfListSellerInfo = sellerInfo.elements(i);
-	}
-
-	String takeElementsOfBuyerFromTheInnerList(int i) {
-
-		String elementsOfListBuyerInfo = " ";
-		return elementsOfListBuyerInfo = buyerInfo.elements(i);
-	}
-
-	public void addInfosToThePanelTop() {
-		for (int i = 0; i < sellerInfo.size(); i++) {
-			windowPanelTop.add(new JLabel(takeElementsOfSellerFromTheInnerList(i)));
-			windowPanelTop.add(new JTextField(""));
+	public void addInfosToThePanel(JPanel windowPanel, int size, boolean clientchoice) {
+		for (int i = 0; i < size; i++) {
+			windowPanel.add(new JLabel(takeElementsOfClientFromTheInnerList(i, clientchoice)));
+			windowPanel.add(new JTextField(""));
 			// maybe better option is to create a list of each new field
 		}
 	}
-
-	public void addInfosToThePanelBottom() {
-		for (int i = 0; i < buyerInfo.size(); i++) {
-			windowPanelBottom.add(new JLabel(takeElementsOfBuyerFromTheInnerList(i)));
-			windowPanelBottom.add(new JTextField(""));
-			// maybe better option is to create a list of each new field
-		}
-	}
+	
 
 	public JLabel doTheJLabel(JLabel confirmedOrError, JPanel windowPanel, String message) {
 		confirmedOrError = new JLabel();
