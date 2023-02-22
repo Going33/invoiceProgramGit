@@ -8,6 +8,4 @@ public class Main {
 		// TODO Auto-generated method stub
 	windowApp test=	new windowApp(buyer, seller);
 	}
-//test
-	//test2
 }

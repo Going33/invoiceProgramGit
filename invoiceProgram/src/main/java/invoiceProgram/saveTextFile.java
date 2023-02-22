@@ -2,13 +2,10 @@ package invoiceProgram;
 
 import java.io.BufferedWriter;
 import java.io.File; // Import the File class
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException; // Import the IOException class to handle errors
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class saveTextFile {
 
@@ -21,34 +18,36 @@ public class saveTextFile {
 	public void makeAFile(Map<String, String> allDataMap) {
 
 		try {
-			// File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
 			// creating new file
 			if (myObj.createNewFile()) {
 				System.out.println("File created: " + myObj.getName());
 
-				
 				// create a file
 				createAFile(allDataMap);
+				System.out.println("tworzenie pliku");
+			} else {
+				
+				
+				// Append new text to existing file
 
-				
-				
-				
-				// read a file
-				try {
-					// File myObj1 = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
-					Scanner myReader = new Scanner(myObj);
-					while (myReader.hasNextLine()) {
-						String data = myReader.nextLine();
-						// System.out.println(data);
+				// try-with-resource statement
+				// https://www.java67.com/2015/07/how-to-append-text-to-existing-file-in-java-example.html
+				try (FileWriter f = new FileWriter(myObj, true);
+						BufferedWriter b = new BufferedWriter(f);
+						PrintWriter p = new PrintWriter(b);) {
+
+					for (Map.Entry<String, String> set : ((Map<String, String>) allDataMap).entrySet()) {
+						// put key and value separated by a colon
+						p.println(set.getKey() + " " + set.getValue());
 					}
-					myReader.close();
-				} catch (FileNotFoundException e) {
-					System.out.println("An error occurred.");
-					e.printStackTrace();
+
+				} catch (IOException i) {
+					i.printStackTrace();
 				}
 
-			} else {
-				System.out.println("File already exists.");
+				System.out.println("File already exists. Append new text to existing file.");
+				// }
+
 			}
 		} catch (IOException e) {
 			System.out.println("An error occurred.");
@@ -57,17 +56,16 @@ public class saveTextFile {
 
 	}
 
+	/////////////////////////////// to optmize//////////////////////////////
 	public void createAFile(Object object) {
-		// write inputs to file
+		// write inputs to file if file dosent exist
 		try {
 			System.out.println("\n");
 			bf = new BufferedWriter(new FileWriter(myObj));
 
 			for (Map.Entry<String, String> set : ((Map<String, String>) object).entrySet()) {
-				// put key and value separated by a colon
 				bf.write(set.getKey() + " " + set.getValue());
 				bf.newLine();
-				// System.out.println("Successfully wrote to the file.");
 			}
 
 			bf.flush();
@@ -78,7 +76,7 @@ public class saveTextFile {
 			e.printStackTrace();
 		}
 	}
-
+/////////////////////////////////////////////////////////////////////
 	public boolean deleteAFIle() {
 
 		if (myObj.delete()) {
@@ -91,8 +89,7 @@ public class saveTextFile {
 		return flagDelete;
 	}
 
-	
-	//////TEST_METHOD///////
+	////// TEST_METHOD///////
 	public boolean checkIfAFIleIsAlreadyExisting() {
 		if (myObj.exists()) {
 			System.out.println("File already exists. Cannot create a new one.");

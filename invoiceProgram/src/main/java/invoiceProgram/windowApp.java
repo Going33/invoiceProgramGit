@@ -35,7 +35,8 @@ public class windowApp extends JFrame implements ActionListener {
 	private static JLabel confirmedOrErrorTop;
 	private static JLabel confirmedOrErrorBottom;
 	private static String message = "";
-	private boolean tryFLag = false;
+	private static boolean overwriteFlag_1 = false;
+	private static boolean overwriteFlag_2 = false;
 	Object newBuyerObjectWindowAppClass;
 	Object newSellerObjectWindowAppClass;
 	// creating objects of "static" data
@@ -69,9 +70,9 @@ public class windowApp extends JFrame implements ActionListener {
 		windowPanelTop = new JPanel(new GridLayout(rowTop, collTop, 0, 0));
 		windowPanelTop.setBackground(Color.WHITE);
 
-		//addInfosToThePanelTop();
-		addInfosToThePanel(windowPanelTop,sellerInfo.size(),true);
-		
+		// addInfosToThePanelTop();
+		addInfosToThePanel(windowPanelTop, sellerInfo.size(), true);
+
 		confirmButtonTop = new JButton("Confirm Data of Seller");
 		clearButtonTop = new JButton("Clear Data of Seller");
 
@@ -89,9 +90,9 @@ public class windowApp extends JFrame implements ActionListener {
 		windowPanelBottom = new JPanel(new GridLayout(rowBottom, collBottom, 0, 0));
 		windowPanelBottom.setBackground(Color.GRAY);
 
-		//addInfosToThePanelBottom();
-		addInfosToThePanel(windowPanelBottom,buyerInfo.size(),false);
-		
+		// addInfosToThePanelBottom();
+		addInfosToThePanel(windowPanelBottom, buyerInfo.size(), false);
+
 		confirmButtonBottom = new JButton("Confirm Data of Buyer");
 		clearButtonBottom = new JButton("Clear Data of Buyer");
 
@@ -134,25 +135,33 @@ public class windowApp extends JFrame implements ActionListener {
 		case "Confirm Data of Seller":
 
 			try {
-//TO_DO		
-////// it 's needed to create one method/class for Seller and Buyer to optimize a code
+
 ///////////////////////////////////////////////TO_OPTIMIZE////////////////////////
 				//// write to txt file
 				saveTextFile testSave = new saveTextFile();
 
-				if (testSave.checkIfAFIleIsAlreadyExisting()) {
-
+				if (testSave.checkIfAFIleIsAlreadyExisting() && !overwriteFlag_1 && !overwriteFlag_2) {
+					System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExisting());
 					message = "Confirmed. Successfully wrote to the file.";
 
 					// creating seller's object and displaying informations in the console
-
-					// v3.0
-					//createAnInputObjectOfSeller(new SellerClass()).displayInInfos();
-					// v4.0 t as an argument - seller
-					createAnInputClientObject(new Client(), windowPanelTop,true).displayInInfos();
-					testSave.makeAFile(createAnInputClientObject(new Client(), windowPanelTop,true).getClientMap());
+					// v4.0 true as an argument - seller
+					createAnInputClientObject(new Client(), windowPanelTop, true).displayInInfos();
+					testSave.makeAFile(createAnInputClientObject(new Client(), windowPanelTop, true).getClientMap());
+					overwriteFlag_1 = true;
+					overwriteFlag_2 = false;
 				} else {
-					message = "File already exists. Cannot create a new one.";
+
+					if (!testSave.checkIfAFIleIsAlreadyExisting() && !overwriteFlag_1 && overwriteFlag_2) {
+						createAnInputClientObject(new Client(), windowPanelTop, true).displayInInfos();
+						testSave.makeAFile(
+								createAnInputClientObject(new Client(), windowPanelTop, true).getClientMap());
+						message = "File already exists. Append new data to existing file.";
+					} else {
+						message = "Old file already exists. Cannot create a new one.";
+						confirmButtonTop.setEnabled(true);
+						clearButtonTop.setEnabled(false);
+					}
 				}
 
 				confirmButtonTop.setEnabled(false);
@@ -171,43 +180,46 @@ public class windowApp extends JFrame implements ActionListener {
 
 				// delete existing "delete" JLabel
 				windowPanelTop.remove(confirmedOrErrorTop);
-				// System.out.println("Stan tryFlag remove_If: "+
-				// checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
-
 			}
 			// creating JLabel for the confirm message
 			confirmedOrErrorTop = doTheJLabel(confirmedOrErrorTop, windowPanelTop, message);
 
 			System.out.println("Data of Seller Confirmed");
-			// System.out.println("Stan tryFlag new JLabel()_If: " +
-			// checkIfJLabelConfirmedOrErrorIsNull(confirmedOrErrorTop, windowPanelTop));
 			break;
 
 		case "Confirm Data of Buyer":
 			System.out.println(" ");
 			try {
 
-				// TO_DO
-				////// it 's needed to create one method/class for Seller and Buyer to optimize
-				////// a code
 /////////////////////////////////////////////// TO_OPTIMIZE////////////////////////
 				//// write to txt file
 				saveTextFile testSave = new saveTextFile();
 
-				if (testSave.checkIfAFIleIsAlreadyExisting()) {
-
+				if (testSave.checkIfAFIleIsAlreadyExisting() && !overwriteFlag_1 && !overwriteFlag_2) {
+					System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExisting());
 					message = "Confirmed. Successfully wrote to the file.";
 
 					// creating seller's object and displaying informations in the console
-
-					// v3.0
-					//createAnInputObjectOfBuyer(new BuyerClass()).displayInInfos();
 					// v4.0 false as an argument - buyer
-					createAnInputClientObject(new Client(), windowPanelBottom,false).displayInInfos();
-				//testSave.makeAFile(createAnInputObjectOfBuyer(new BuyerClass()).getMapBuyer());
-					testSave.makeAFile(createAnInputClientObject(new Client(), windowPanelBottom,false).getClientMap());
+					createAnInputClientObject(new Client(), windowPanelBottom, false).displayInInfos();
+					testSave.makeAFile(
+							createAnInputClientObject(new Client(), windowPanelBottom, false).getClientMap());
+					overwriteFlag_1 = false;
+					overwriteFlag_2 = true;
 				} else {
-					message = "File already exists. Cannot create a new one.";
+					System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExisting());
+					if (!testSave.checkIfAFIleIsAlreadyExisting() && overwriteFlag_1 && !overwriteFlag_2) {
+						createAnInputClientObject(new Client(), windowPanelBottom, false).displayInInfos();
+						testSave.makeAFile(
+								createAnInputClientObject(new Client(), windowPanelBottom, false).getClientMap());
+
+						message = "File already exists. Append new data to existing file.";
+
+					} else {
+						message = "Old file already exists. Cannot create a new one.";
+						confirmButtonBottom.setEnabled(true);
+						clearButtonBottom.setEnabled(false);
+					}
 				}
 
 				confirmButtonBottom.setEnabled(false);
@@ -227,7 +239,7 @@ public class windowApp extends JFrame implements ActionListener {
 
 				// delete existing "delete" JLabel
 				windowPanelBottom.remove(confirmedOrErrorBottom);
-				
+
 			}
 			// creating JLabel for the confirm message
 			confirmedOrErrorBottom = doTheJLabel(confirmedOrErrorBottom, windowPanelBottom, message);
@@ -277,57 +289,48 @@ public class windowApp extends JFrame implements ActionListener {
 
 	//////////////////////////////// Objects//////////////////////////////////
 
-
 ////////creating specific Object - Client (Seller or Buyer) ////////////////
-public Client createAnInputClientObject(Client clientInInfos,JPanel windowPanel, boolean clientchoice)
-{
-	// SellerClass sellerInInfos = new SellerClass();
+	public Client createAnInputClientObject(Client clientInInfos, JPanel windowPanel, boolean clientchoice) {
+		// SellerClass sellerInInfos = new SellerClass();
 
-	///////////////// iterate through Jpanel
-	/// https://stackoverflow.com/questions/1037139/loop-through-jpanel
-	int z = 0;
-	int k = 0;
-	clientInInfos.clearTreeMap();
-	for (Component c : windowPanel.getComponents()) {
+		///////////////// iterate through Jpanel
+		/// https://stackoverflow.com/questions/1037139/loop-through-jpanel
+		int z = 0;
+		int k = 0;
+		clientInInfos.clearTreeMap();
+		for (Component c : windowPanel.getComponents()) {
 
-		if (c instanceof JTextField) {
-			((JTextField) c).getText();
+			if (c instanceof JTextField) {
+				((JTextField) c).getText();
 
-			if (z % 2 != 0) {
-				// System.out.println(z);
-				// add to HASHMAP Object
-				clientInInfos.putInInfos(takeElementsOfClientFromTheInnerList(k, clientchoice).toString(),
-						((JTextField) c).getText());
-				k = k + 1;
+				if (z % 2 != 0) {
+					// add to HASHMAP Object
+					clientInInfos.putInInfos(takeElementsOfClientFromTheInnerList(k, clientchoice).toString(),
+							((JTextField) c).getText());
+					k = k + 1;
+				}
+
 			}
+			z++;
 
 		}
-		z++;
 
+		return clientInInfos;
 	}
-
-
-	return clientInInfos;
-}
-	
-
 
 //////////////////////////////// GUI//////////////////////////////////
 
 ////////getting and adding names of fields////////////////
-	String takeElementsOfClientFromTheInnerList(int i,boolean clientchoice) {
+	String takeElementsOfClientFromTheInnerList(int i, boolean clientchoice) {
 
 		String elementsOfListClientInfo = " ";
-		if(clientchoice)
-		{
+		if (clientchoice) {
 			elementsOfListClientInfo = sellerInfo.elements(i);
-		}else
-		{
+		} else {
 			elementsOfListClientInfo = buyerInfo.elements(i);
 		}
 		return elementsOfListClientInfo;
 	}
-	
 
 	public void addInfosToThePanel(JPanel windowPanel, int size, boolean clientchoice) {
 		for (int i = 0; i < size; i++) {
@@ -336,7 +339,6 @@ public Client createAnInputClientObject(Client clientInInfos,JPanel windowPanel,
 			// maybe better option is to create a list of each new field
 		}
 	}
-	
 
 	public JLabel doTheJLabel(JLabel confirmedOrError, JPanel windowPanel, String message) {
 		confirmedOrError = new JLabel();
@@ -365,19 +367,49 @@ public Client createAnInputClientObject(Client clientInInfos,JPanel windowPanel,
 				((JTextField) c).setText("");
 			}
 		}
-
+		overwriteFlag_1 = false;
+		overwriteFlag_2 = false;
 		repaintFrame();
-
 		BtnConfirm.setEnabled(true);
 		BtnClear.setEnabled(false);
 
 	}
 
 ////////////////////////////////ADDITIONAL FILE OPERATIONS//////////////////////////////////
+
+	public void saveData() {
+		//// write to txt file
+		saveTextFile testSave = new saveTextFile();
+
+		if (testSave.checkIfAFIleIsAlreadyExisting() && !overwriteFlag_1 && !overwriteFlag_2) {
+			System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExisting());
+			message = "Confirmed. Successfully wrote to the file.";
+
+			// creating seller's object and displaying informations in the console
+
+			// v4.0 false as an argument - buyer
+			createAnInputClientObject(new Client(), windowPanelBottom, false).displayInInfos();
+			testSave.makeAFile(createAnInputClientObject(new Client(), windowPanelBottom, false).getClientMap());
+			overwriteFlag_1 = false;
+			overwriteFlag_2 = true;
+		} else {
+			System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExisting());
+			if (!testSave.checkIfAFIleIsAlreadyExisting() && overwriteFlag_1 && !overwriteFlag_2) {
+				createAnInputClientObject(new Client(), windowPanelBottom, false).displayInInfos();
+				testSave.makeAFile(createAnInputClientObject(new Client(), windowPanelBottom, false).getClientMap());
+
+				message = "File already exists. Append new data to existing file.";
+
+			} else {
+				message = "Old file already exists. Cannot create a new one.";
+				confirmButtonTop.setEnabled(true);
+				clearButtonTop.setEnabled(false);
+			}
+		}
+	}
+
 	public String deleteExistingFileGUI(saveTextFile deleteFile, boolean flagAppWindow) {
 
-		// saveTextFile deleteSeller = new saveTextFile();
-		// boolean flagAppWindow = false;
 		flagAppWindow = deleteFile.deleteAFIle();
 		if (flagAppWindow) {
 			message = "File deleted successfully";
