@@ -2,7 +2,29 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>invoiceProgram</groupId>
   <artifactId>invoiceProgram</artifactId>
+  
   <version>0.0.1-SNAPSHOT</version>
   <name>invoiceProgram</name>
   <description>Program for making invoices</description>
+  
+  
+   <!-- for pdf creating -->
+  <dependencies>
+  <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
+  
+<dependency>
+    <groupId>org.apache.pdfbox</groupId>
+    <artifactId>pdfbox</artifactId>
+    <version>3.0.0-alpha3</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
+<dependency>
+    <groupId>org.apache.pdfbox</groupId>
+    <artifactId>pdfbox</artifactId>
+    <version>2.0.27</version>
+</dependency>
+
+</dependencies>
+  
 </project>
