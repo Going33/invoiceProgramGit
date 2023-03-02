@@ -140,8 +140,8 @@ public class windowApp extends JFrame implements ActionListener {
 				//// write to txt file
 				saveTextFile testSave = new saveTextFile();
 
-				if (testSave.checkIfAFIleIsAlreadyExisting() && !overwriteFlag_1 && !overwriteFlag_2) {
-					System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExisting());
+				if (testSave.checkIfAFIleIsAlreadyExistingPDF() && !overwriteFlag_1 && !overwriteFlag_2) {
+					System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExistingPDF());
 					message = "Confirmed. Successfully wrote to the file.";
 
 					// creating seller's object and displaying informations in the console
@@ -152,7 +152,7 @@ public class windowApp extends JFrame implements ActionListener {
 					overwriteFlag_2 = false;
 				} else {
 
-					if (!testSave.checkIfAFIleIsAlreadyExisting() && !overwriteFlag_1 && overwriteFlag_2) {
+					if (!testSave.checkIfAFIleIsAlreadyExistingPDF() && !overwriteFlag_1 && overwriteFlag_2) {
 						createAnInputClientObject(new Client(), windowPanelTop, true).displayInInfos();
 						testSave.makeAFile(
 								createAnInputClientObject(new Client(), windowPanelTop, true).getClientMap());
@@ -195,8 +195,8 @@ public class windowApp extends JFrame implements ActionListener {
 				//// write to txt file
 				saveTextFile testSave = new saveTextFile();
 
-				if (testSave.checkIfAFIleIsAlreadyExisting() && !overwriteFlag_1 && !overwriteFlag_2) {
-					System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExisting());
+				if (testSave.checkIfAFIleIsAlreadyExistingPDF() && !overwriteFlag_1 && !overwriteFlag_2) {
+					System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExistingPDF());
 					message = "Confirmed. Successfully wrote to the file.";
 
 					// creating seller's object and displaying informations in the console
@@ -207,8 +207,8 @@ public class windowApp extends JFrame implements ActionListener {
 					overwriteFlag_1 = false;
 					overwriteFlag_2 = true;
 				} else {
-					System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExisting());
-					if (!testSave.checkIfAFIleIsAlreadyExisting() && overwriteFlag_1 && !overwriteFlag_2) {
+					System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExistingPDF());
+					if (!testSave.checkIfAFIleIsAlreadyExistingPDF() && overwriteFlag_1 && !overwriteFlag_2) {
 						createAnInputClientObject(new Client(), windowPanelBottom, false).displayInInfos();
 						testSave.makeAFile(
 								createAnInputClientObject(new Client(), windowPanelBottom, false).getClientMap());
@@ -381,8 +381,8 @@ public class windowApp extends JFrame implements ActionListener {
 		//// write to txt file
 		saveTextFile testSave = new saveTextFile();
 
-		if (testSave.checkIfAFIleIsAlreadyExisting() && !overwriteFlag_1 && !overwriteFlag_2) {
-			System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExisting());
+		if (testSave.checkIfAFIleIsAlreadyExistingPDF() && !overwriteFlag_1 && !overwriteFlag_2) {
+			System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExistingPDF());
 			message = "Confirmed. Successfully wrote to the file.";
 
 			// creating seller's object and displaying informations in the console
@@ -393,8 +393,8 @@ public class windowApp extends JFrame implements ActionListener {
 			overwriteFlag_1 = false;
 			overwriteFlag_2 = true;
 		} else {
-			System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExisting());
-			if (!testSave.checkIfAFIleIsAlreadyExisting() && overwriteFlag_1 && !overwriteFlag_2) {
+			System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExistingPDF());
+			if (!testSave.checkIfAFIleIsAlreadyExistingPDF() && overwriteFlag_1 && !overwriteFlag_2) {
 				createAnInputClientObject(new Client(), windowPanelBottom, false).displayInInfos();
 				testSave.makeAFile(createAnInputClientObject(new Client(), windowPanelBottom, false).getClientMap());
 

@@ -16,14 +16,16 @@ import org.apache.pdfbox.text.PDFTextStripper;
 public class saveTextFile {
 
 	// tworzenie pliku
-	private File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
-	private File myObjPDF = new File("C:\\Users\\Bartek\\Desktop\\TEST\\testPDF.pdf");
+	// private File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
+	final private String absPathTxt = System.getProperty("user.dir") + "\\test.txt";
+	final private String absPathPDF = System.getProperty("user.dir") + "\\testPDF.pdf";
+	final private File myObj = new File(absPathTxt);
+	final private File myObjPDF = new File(absPathPDF);
 
 	private BufferedWriter bf;
 	private boolean flagDelete;
 	private boolean flagCheck;
-	private String text = "";
-	private int i = 5;
+	private int fontSizeValue = 12;
 
 //https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox 
 //pdf creator
@@ -32,59 +34,25 @@ public class saveTextFile {
 		try {
 
 			// creating new file
-			if (myObj.createNewFile()) {
+			if (myObjPDF.createNewFile()) {
 
 				System.out.println("File created: " + myObj.getName());
-
+				System.out.println(System.getProperty("user.dir"));
 				// create a file
-				createAFile(allDataMap);
-				createAFilePDF(allDataMap);
-				System.out.println("tworzenie pliku");
+
+				PDDocument document = new PDDocument();
+				document.addPage(new PDPage());
+				// PDPage page = document.getPage(0);
+
+				createAFilePDF(allDataMap, document, document.getPage(0),
+						new PDPageContentStream(document, document.getPage(0)), 5, 780);
+				System.out.println("PDF file created.");
 
 			} else {
 
-				// Append new text to existing file
-
-				PDDocument documentOpen = PDDocument.load(myObjPDF);
-				PDPage page = documentOpen.getPage(0);
-				//	https://stackoverflow.com/questions/14657602/cannot-figure-out-how-to-use-pdfbox
-				PDPageContentStream contentStream = new PDPageContentStream(documentOpen, page, PDPageContentStream.AppendMode.APPEND, true);
-				try {
-					contentStream.beginText();
-						contentStream.setFont(PDType1Font.TIMES_ROMAN, 12);
-					contentStream.newLineAtOffset(5, 620);
-					for (Map.Entry<String, String> set : ((Map<String, String>) allDataMap).entrySet()) {
-
-						contentStream.showText(set.getKey().toString() + " " + set.getValue().toString());
-						contentStream.newLineAtOffset(0, -20);
-						// contentStream.newLine();
-					}
-					contentStream.endText();
-					contentStream.close();
-					// Saving the document
-					documentOpen.save(new File("C:\\Users\\Bartek\\Desktop\\TEST\\testPDF.pdf"));
-					// Closing the document
-					documentOpen.close();
-
-				} catch (IOException e) {
-					System.out.println("An error occurred.");
-					e.printStackTrace();
-				}
-
-				// try-with-resource statement
-				// https://www.java67.com/2015/07/how-to-append-text-to-existing-file-in-java-example.html
-				try (FileWriter f = new FileWriter(myObj, true);
-						BufferedWriter b = new BufferedWriter(f);
-						PrintWriter p = new PrintWriter(b);) {
-
-					for (Map.Entry<String, String> set : ((Map<String, String>) allDataMap).entrySet()) {
-						// put key and value separated by a colon
-						p.println(set.getKey() + " " + set.getValue());
-					}
-
-				} catch (IOException i) {
-					i.printStackTrace();
-				}
+				PDDocument document = PDDocument.load(myObjPDF);
+				createAFilePDF(allDataMap, document, document.getPage(0), new PDPageContentStream(document,
+						document.getPage(0), PDPageContentStream.AppendMode.APPEND, true), 350, 780);
 
 				System.out.println("File already exists. Append new text to existing file.");
 				// }
@@ -98,35 +66,23 @@ public class saveTextFile {
 	}
 
 	/////////////////////////////// to optmize//////////////////////////////
-	public void createAFilePDF(Object object) throws IOException {
-		// write inputs to file if file dosent exist
-
-		// Loading an existing document
-		PDDocument document = new PDDocument();
-		// PDDocument document = PDDocument.load(file);
-		document.addPage(new PDPage());
-		// Retrieving the pages of the document
-		PDPage page = document.getPage(0);
-		PDPageContentStream contentStream = new PDPageContentStream(document, page);
+	public void createAFilePDF(Object object, PDDocument document, PDPage page, PDPageContentStream contentStream,
+			int tX, int tY) throws IOException {
 
 		try {
 			System.out.println("\n");
 			contentStream.beginText();
 			// Setting the font to the Content stream
-			contentStream.setFont(PDType1Font.TIMES_ROMAN, 12);
-			contentStream.newLineAtOffset(5, 780);
+			contentStream.setFont(PDType1Font.TIMES_ROMAN, fontSizeValue);
+			contentStream.newLineAtOffset(tX, tY);
 			for (Map.Entry<String, String> set : ((Map<String, String>) object).entrySet()) {
-				// contentStream.setLeading(15);
 				contentStream.showText(set.getKey().toString() + " " + set.getValue().toString());
 				contentStream.newLineAtOffset(0, -20);
-
-				i = i + 50;
-				// contentStream.newLine();
 			}
 			contentStream.endText();
 			contentStream.close();
 			// Saving the document
-			document.save(new File("C:\\Users\\Bartek\\Desktop\\TEST\\testPDF.pdf"));
+			document.save(new File(absPathPDF));
 			// Closing the document
 			document.close();
 
@@ -173,6 +129,17 @@ public class saveTextFile {
 	////// TEST_METHOD///////
 	public boolean checkIfAFIleIsAlreadyExisting() {
 		if (myObj.exists()) {
+			System.out.println("File already exists. Cannot create a new one.");
+			flagCheck = false;
+		} else {
+			System.out.println("Confirmed. Successfully wrote to the file.");
+			flagCheck = true;
+		}
+		return flagCheck;
+	}
+
+	public boolean checkIfAFIleIsAlreadyExistingPDF() {
+		if (myObjPDF.exists()) {
 			System.out.println("File already exists. Cannot create a new one.");
 			flagCheck = false;
 		} else {
