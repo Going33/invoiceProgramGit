@@ -1,4 +1,4 @@
-package invoiceProgram;
+package Client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,7 @@ public final class dataOfSeller {
 	
 	private final List<String> sellerInfo = new ArrayList<String>();
 	
-	dataOfSeller()
+	public dataOfSeller()
 	{
 		sellerInfo.add("01.Seller:");
 		sellerInfo.add("02.Address:");

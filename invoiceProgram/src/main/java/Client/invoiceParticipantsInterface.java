@@ -1,4 +1,4 @@
-package invoiceProgram;
+package Client;
 
 
 public interface invoiceParticipantsInterface {

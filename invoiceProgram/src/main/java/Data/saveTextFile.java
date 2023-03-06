@@ -1,4 +1,4 @@
-package invoiceProgram;
+package Data;
 
 import java.io.BufferedWriter;
 import java.io.File; // Import the File class

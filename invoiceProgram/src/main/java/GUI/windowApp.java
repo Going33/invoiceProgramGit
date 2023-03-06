@@ -1,4 +1,4 @@
-package invoiceProgram;
+package GUI;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -13,6 +13,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+
+import Client.Client;
+import Client.dataOfBuyer;
+import Client.dataOfSeller;
+import Data.saveTextFile;
+
 
 public class windowApp extends JFrame implements ActionListener {
 
@@ -45,7 +51,7 @@ public class windowApp extends JFrame implements ActionListener {
 
 	saveTextFile testZapis = new saveTextFile();
 
-	windowApp(Object newBuyerObject, Object newSellerObject) {
+	public windowApp(Object newBuyerObject, Object newSellerObject) {
 
 		// Construtors for external objects
 		this.newBuyerObjectWindowAppClass = newBuyerObject;
@@ -136,26 +142,22 @@ public class windowApp extends JFrame implements ActionListener {
 
 			try {
 
-///////////////////////////////////////////////TO_OPTIMIZE////////////////////////
-				//// write to txt file
 				saveTextFile testSave = new saveTextFile();
 
 				if (testSave.checkIfAFIleIsAlreadyExistingPDF() && !overwriteFlag_1 && !overwriteFlag_2) {
 					System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExistingPDF());
-					message = "Confirmed. Successfully wrote to the file.";
 
 					// creating seller's object and displaying informations in the console
-					// v4.0 true as an argument - seller
-					createAnInputClientObject(new Client(), windowPanelTop, true).displayInInfos();
-					testSave.makeAFile(createAnInputClientObject(new Client(), windowPanelTop, true).getClientMap());
+					theMiracleOfCreation(testSave, windowPanelTop, true);
+
+					message = "Confirmed. Successfully wrote to the file.";
 					overwriteFlag_1 = true;
 					overwriteFlag_2 = false;
 				} else {
 
 					if (!testSave.checkIfAFIleIsAlreadyExistingPDF() && !overwriteFlag_1 && overwriteFlag_2) {
-						createAnInputClientObject(new Client(), windowPanelTop, true).displayInInfos();
-						testSave.makeAFile(
-								createAnInputClientObject(new Client(), windowPanelTop, true).getClientMap());
+
+						theMiracleOfCreation(testSave, windowPanelTop, true);
 						message = "File already exists. Append new data to existing file.";
 					} else {
 						message = "Old file already exists. Cannot create a new one.";
@@ -191,8 +193,6 @@ public class windowApp extends JFrame implements ActionListener {
 			System.out.println(" ");
 			try {
 
-/////////////////////////////////////////////// TO_OPTIMIZE////////////////////////
-				//// write to txt file
 				saveTextFile testSave = new saveTextFile();
 
 				if (testSave.checkIfAFIleIsAlreadyExistingPDF() && !overwriteFlag_1 && !overwriteFlag_2) {
@@ -200,19 +200,14 @@ public class windowApp extends JFrame implements ActionListener {
 					message = "Confirmed. Successfully wrote to the file.";
 
 					// creating seller's object and displaying informations in the console
-					// v4.0 false as an argument - buyer
-					createAnInputClientObject(new Client(), windowPanelBottom, false).displayInInfos();
-					testSave.makeAFile(
-							createAnInputClientObject(new Client(), windowPanelBottom, false).getClientMap());
+					theMiracleOfCreation(testSave, windowPanelBottom, false);
 					overwriteFlag_1 = false;
 					overwriteFlag_2 = true;
 				} else {
 					System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExistingPDF());
 					if (!testSave.checkIfAFIleIsAlreadyExistingPDF() && overwriteFlag_1 && !overwriteFlag_2) {
-						createAnInputClientObject(new Client(), windowPanelBottom, false).displayInInfos();
-						testSave.makeAFile(
-								createAnInputClientObject(new Client(), windowPanelBottom, false).getClientMap());
 
+						theMiracleOfCreation(testSave, windowPanelBottom, false);
 						message = "File already exists. Append new data to existing file.";
 
 					} else {
@@ -224,8 +219,6 @@ public class windowApp extends JFrame implements ActionListener {
 
 				confirmButtonBottom.setEnabled(false);
 				clearButtonBottom.setEnabled(true);
-
-				/////////////////////////////////////////////// TO_OPTIMIZE////////////////////////
 
 			} catch (Exception e1) {
 				// cleanUp();
@@ -287,10 +280,11 @@ public class windowApp extends JFrame implements ActionListener {
 
 	}
 
+
 	//////////////////////////////// Objects//////////////////////////////////
 
 ////////creating specific Object - Client (Seller or Buyer) ////////////////
-	public Client createAnInputClientObject(Client clientInInfos, JPanel windowPanel, boolean clientchoice) {
+	private Client createAnInputClientObject(Client clientInInfos, JPanel windowPanel, boolean clientchoice) {
 		// SellerClass sellerInInfos = new SellerClass();
 
 		///////////////// iterate through Jpanel
@@ -317,7 +311,12 @@ public class windowApp extends JFrame implements ActionListener {
 
 		return clientInInfos;
 	}
+	private void theMiracleOfCreation(saveTextFile object, JPanel windowPanel, boolean decision) {
+		// just do the things
+		createAnInputClientObject(new Client(), windowPanel, decision).displayInInfos();
+		object.makeAFile(createAnInputClientObject(new Client(), windowPanel, decision).getClientMap());
 
+	}
 //////////////////////////////// GUI//////////////////////////////////
 
 ////////getting and adding names of fields////////////////
@@ -332,7 +331,7 @@ public class windowApp extends JFrame implements ActionListener {
 		return elementsOfListClientInfo;
 	}
 
-	public void addInfosToThePanel(JPanel windowPanel, int size, boolean clientchoice) {
+	private void addInfosToThePanel(JPanel windowPanel, int size, boolean clientchoice) {
 		for (int i = 0; i < size; i++) {
 			windowPanel.add(new JLabel(takeElementsOfClientFromTheInnerList(i, clientchoice)));
 			windowPanel.add(new JTextField(""));
@@ -340,20 +339,20 @@ public class windowApp extends JFrame implements ActionListener {
 		}
 	}
 
-	public JLabel doTheJLabel(JLabel confirmedOrError, JPanel windowPanel, String message) {
+	private JLabel doTheJLabel(JLabel confirmedOrError, JPanel windowPanel, String message) {
 		confirmedOrError = new JLabel();
 		windowPanel.add(confirmedOrError);
 		confirmedOrError.setText(message);
 		return confirmedOrError;
 	}
 
-	public static void repaintFrame() {
+	private static void repaintFrame() {
 		windowFrame.invalidate();
 		windowFrame.validate();
 		windowFrame.repaint();
 	}
 
-	public static void cleanUp(JPanel panelToClean, JLabel confirmedOrError, JButton BtnConfirm, JButton BtnClear) {
+	private static void cleanUp(JPanel panelToClean, JLabel confirmedOrError, JButton BtnConfirm, JButton BtnClear) {
 
 		// confirmedOrError.setText(" ");
 		// confirmedOrError =null;
@@ -377,7 +376,7 @@ public class windowApp extends JFrame implements ActionListener {
 
 ////////////////////////////////ADDITIONAL FILE OPERATIONS//////////////////////////////////
 
-	public void saveData() {
+	private void saveData() {
 		//// write to txt file
 		saveTextFile testSave = new saveTextFile();
 
@@ -408,7 +407,7 @@ public class windowApp extends JFrame implements ActionListener {
 		}
 	}
 
-	public String deleteExistingFileGUI(saveTextFile deleteFile, boolean flagAppWindow) {
+	private String deleteExistingFileGUI(saveTextFile deleteFile, boolean flagAppWindow) {
 
 		flagAppWindow = deleteFile.deleteAFIle();
 		if (flagAppWindow) {
@@ -420,7 +419,7 @@ public class windowApp extends JFrame implements ActionListener {
 	}
 
 ////////////////////////////////TEST METHODS//////////////////////////////////
-	public boolean checkIfJLabelConfirmedOrErrorIsNull(JLabel confirmedOrError, JPanel windowPanel) {
+	private boolean checkIfJLabelConfirmedOrErrorIsNull(JLabel confirmedOrError, JPanel windowPanel) {
 		boolean flaghelp;
 		if (confirmedOrError != null) {
 			// System.out.println("Confirmed NOT NULL");

@@ -1,9 +1,11 @@
-package invoiceProgram;
+package Client;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+
 
 public class Client implements invoiceParticipantsInterface {
 
