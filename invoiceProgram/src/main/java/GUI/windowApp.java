@@ -198,6 +198,8 @@ public class windowApp extends JFrame implements ActionListener {
 					message = "Confirmed. Successfully wrote to the file.";
 					conditionFlag_1 = true;
 					conditionFlag_2 = false;
+					confirmButtonTop.setEnabled(false);
+					clearButtonTop.setEnabled(true);
 
 				} else {
 
@@ -205,17 +207,15 @@ public class windowApp extends JFrame implements ActionListener {
 
 						TheMiracleOfCreation(testSave, windowPanelTop, true);
 						message = "File already exists. Append new data to existing file.";
+						confirmButtonTop.setEnabled(false);
+						clearButtonTop.setEnabled(true);
 					} else {
 						message = "Old file already exists. Cannot create a new one.";
-						confirmButtonTop.setEnabled(true);
-						clearButtonTop.setEnabled(false);
-						confirmButtonBottom.setEnabled(false);
-						clearButtonBottom.setEnabled(false);
+					SetButtonsOff();
 					}
 				}
 
-				confirmButtonTop.setEnabled(false);
-				clearButtonTop.setEnabled(true);
+
 
 ///////////////////////////////////////////////
 			} catch (Exception e1) {
@@ -252,25 +252,23 @@ public class windowApp extends JFrame implements ActionListener {
 					TheMiracleOfCreation(testSave, windowPanelBottom, false);
 					conditionFlag_1 = false;
 					conditionFlag_2 = true;
-
+					confirmButtonBottom.setEnabled(false);
+					clearButtonBottom.setEnabled(true);
 				} else {
 					// System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExistingPDF());
 					if (!testSave.checkIfAFIleIsAlreadyExistingPDF() && conditionFlag_1 && !conditionFlag_2) {
 
 						TheMiracleOfCreation(testSave, windowPanelBottom, false);
 						message = "File already exists. Append new data to existing file.";
-
+						confirmButtonBottom.setEnabled(false);
+						clearButtonBottom.setEnabled(true);
 					} else {
 						message = "Old file already exists. Cannot create a new one.";
-						confirmButtonBottom.setEnabled(true);
-						clearButtonBottom.setEnabled(false);
-						confirmButtonTop.setEnabled(false);
-						clearButtonTop.setEnabled(false);
+						SetButtonsOff();
 					}
 				}
 
-				confirmButtonBottom.setEnabled(false);
-				clearButtonBottom.setEnabled(true);
+
 
 			} catch (Exception e1) {
 				// ClearOnlyPanel();
@@ -498,7 +496,13 @@ public class windowApp extends JFrame implements ActionListener {
 
 		// confirmedOrError.setText(" ");
 		// confirmedOrError =null;
-		panelToClean.remove(confirmedOrError);
+		//if file exists but and delete button is pressed first
+		if(confirmedOrError!=null)
+		{
+		
+			panelToClean.remove(confirmedOrError);
+		}
+	
 		for (int i = 0; i <= 30; i++) {
 			System.out.println(" ");
 		}
@@ -547,9 +551,9 @@ public class windowApp extends JFrame implements ActionListener {
 
 	static void SetButtonsOff() {
 		confirmButtonTop.setEnabled(false);
-		clearButtonTop.setEnabled(true);
+		clearButtonTop.setEnabled(false);
 		confirmButtonBottom.setEnabled(false);
-		clearButtonBottom.setEnabled(true);
+		clearButtonBottom.setEnabled(false);
 	}
 
 	private String DeleteFlagGUI(saveTextFile deleteFile, boolean flagAppWindow) {
