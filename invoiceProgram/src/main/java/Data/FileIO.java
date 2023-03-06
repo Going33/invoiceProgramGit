@@ -9,13 +9,15 @@ import Client.Client;
 
 
 
-
-
+//TODO
+//below it's only an idea how to create "data base"
+//inspired by https://github.com/ssoad/BankingSystem
+// must be adjusted and implemented later
 
 public class FileIO {
-	
+
 	public static Client client=null;
-	
+
 	public static void Read()
 	{
 //		Bank bank =null;
@@ -26,11 +28,11 @@ public class FileIO {
 			oin=new ObjectInputStream(fis);
 			FileIO.client=(Client)oin.readObject();
 			}
-			
+
 		catch (Exception en) {
 			FileIO.client=new Client();
 				}
-		
+
 		finally{
 			try{
 				if(oin!=null) oin.close();
@@ -38,11 +40,11 @@ public class FileIO {
 			}
 			catch (IOException en) {
 					}
-			
+
 		}
 		//return bank;
 	}
-	
+
 	public static void Write()
 	{
 		try {
@@ -54,7 +56,7 @@ public class FileIO {
 			}
 			catch(Exception en)
 			{
-				
+
 			}
 	}
 
