@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException; // Import the IOException class to handle errors
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -18,7 +19,9 @@ public class saveTextFile {
 
 	// tworzenie pliku
 	// private File myObj = new File("C:\\Users\\Bartek\\Desktop\\TEST\\test.txt");
+	private int i =0;
 	final private String absPathPDF = System.getProperty("user.dir") + "\\Invoice_"+LocalDate.now()+".pdf";
+	//private String absPathPDF;
 	final private File myObjPDF = new File(absPathPDF);
 
 	private boolean flagDelete;
@@ -33,7 +36,7 @@ public class saveTextFile {
 
 			// creating new file
 			if (myObjPDF.createNewFile()) {
-
+			//	absPathPDF = System.getProperty("user.dir") + "\\Invoice_"+LocalDate.now()+i+".pdf";
 				System.out.println("File created: " + myObjPDF.getName());
 				System.out.println(System.getProperty("user.dir"));
 				// create a file
@@ -60,7 +63,7 @@ public class saveTextFile {
 			System.out.println("An error occurred.");
 			e.printStackTrace();
 		}
-
+	
 	}
 
 	/////////////////////////////// to optmize//////////////////////////////
@@ -101,28 +104,6 @@ public class saveTextFile {
 		}
 	}
 
-/////////////////////////////// to optmize//////////////////////////////
-//	public void createAFile(Object object) {
-//// write inputs to file if file dosent exist
-//		try {
-//			System.out.println("\n");
-//			bf = new BufferedWriter(new FileWriter(myObj));
-//
-//			for (Map.Entry<String, String> set : ((Map<String, String>) object).entrySet()) {
-//				bf.write(set.getKey() + " " + set.getValue());
-//				bf.newLine();
-//			}
-//
-//			bf.flush();
-//			bf.close();
-//
-//		} catch (IOException e) {
-//			System.out.println("An error occurred.");
-//			e.printStackTrace();
-//		}
-//	}
-
-/////////////////////////////////////////////////////////////////////
 	public boolean deleteAFIle() {
 
 		if (myObjPDF.delete()) {
@@ -135,17 +116,6 @@ public class saveTextFile {
 		return flagDelete;
 	}
 
-	////// TEST_METHOD///////
-//	public boolean checkIfAFIleIsAlreadyExisting() {
-//		if (myObj.exists()) {
-//			System.out.println("File already exists. Cannot create a new one.");
-//			flagCheck = false;
-//		} else {
-//			System.out.println("Confirmed. Successfully wrote to the file.");
-//			flagCheck = true;
-//		}
-//		return flagCheck;
-//	}
 
 	public boolean checkIfAFIleIsAlreadyExistingPDF() {
 		if (myObjPDF.exists()) {
@@ -158,4 +128,8 @@ public class saveTextFile {
 		return flagCheck;
 	}
 
+	
+	
+	////////////usuwanie tekstu/edycja///////////
+	//https://stackoverflow.com/questions/63592078/replace-or-remove-text-from-pdf-with-pdfbox-in-java
 }

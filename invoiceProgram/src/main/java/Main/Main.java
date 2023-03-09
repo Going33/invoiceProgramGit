@@ -2,8 +2,6 @@ package Main;
 
 import java.awt.EventQueue;
 
-import GUI.windowApp;
-
 
 
 public class Main {
@@ -14,8 +12,8 @@ public class Main {
 				public void run() {
 					try {
 						
-						 new GUI.windowApp();
-			
+					 new GUI.windowApp();
+						
 						
 					} catch (Exception e) {
 						e.printStackTrace();

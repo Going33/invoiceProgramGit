@@ -50,6 +50,8 @@ public class FileIO {
 		try {
 			FileOutputStream fout=new FileOutputStream("data");
 			ObjectOutputStream out=new ObjectOutputStream(fout);
+			System.out.println(fout);
+			System.out.println(out);
 			out.writeObject(FileIO.client);
 			out.flush();
 			fout.close();

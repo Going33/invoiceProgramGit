@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 
 
-public class Client implements invoiceParticipantsInterface {
+public class Client implements SomeInvoiceMethods_DefinitelyItNeedsBetterNameInterface {
 
 	private Map<String, String> ClientMap = new TreeMap<String, String>();
 	private Set<String> keys = ClientMap.keySet(); // The set of keys in the map.
@@ -53,6 +53,21 @@ public class Client implements invoiceParticipantsInterface {
 	public void clearTreeMap() {
 		ClientMap.clear();
 		
+	}
+
+
+
+	@Override
+	public String elements(int i) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public int findSize() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 

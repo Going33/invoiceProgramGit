@@ -1,13 +1,13 @@
 package Client;
 
 
-public interface invoiceParticipantsInterface {
+public interface SomeInvoiceMethods_DefinitelyItNeedsBetterNameInterface {
 	
 
 	void putInInfos(String string1, String string2);
 	void displayInInfos();
 	void deleteDuplicate();
 	void clearTreeMap();
-
-	
+	int findSize();
+	String elements(int i);
 }
