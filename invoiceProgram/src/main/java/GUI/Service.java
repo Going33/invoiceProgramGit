@@ -13,12 +13,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import Client.dataOfAll;
+import Data.saveTextFile;
 import Main.Main;
 
 public class Service extends windowApp implements ActionListener {
 	private JFrame windowFrame;
 	private JPanel windowPanel;
-	 private static JLabel confirmedOrError;
+	 private static JLabel infoLabel;
 	 private int widthWindowMain = 600;
 	 private int heightWindowMain = 600;
 	private int row = 24;
@@ -149,16 +150,17 @@ public class Service extends windowApp implements ActionListener {
 						windowFrame.dispose();
 						  System.exit(0);
 						  //TODO - if possible
-						new Main();
+						new windowApp();
 					}else {
 						windowFrame.dispose();
 					}
 				} else {
 					// System.out.println("Boolean " + testSave.checkIfAFIleIsAlreadyExistingPDF());
 					if (!testSave.checkIfAFIleIsAlreadyExistingPDF() && !conditionFlag_1) {
-
-						TheMiracleOfCreation(testSave, windowPanel, 3);
-						message = "File already exists. Append new data to existing file.";
+						//pos x,pos y
+						// pos_x offset, pos_y offset
+						TheMiracleOfCreation(testSave, windowPanel, 3,5,550,0,0,true);
+						message = "Append new data to the created file.";
 						confirmButton.setEnabled(false);
 						clearButton.setEnabled(true);
 						conditionFlag_1=true;
@@ -175,14 +177,14 @@ public class Service extends windowApp implements ActionListener {
 
 			}
 
-			if (!CheckStatusOfLabel(confirmedOrError, windowPanel)) {
+			if (!CheckStatusOfLabel(infoLabel, windowPanel)) {
 
 				// delete existing "delete" JLabel
-				windowPanel.remove(confirmedOrError);
+				windowPanel.remove(infoLabel);
 
 			}
 			// creating JLabel for the confirm message
-			confirmedOrError = CreateJLabel(confirmedOrError, windowPanel, message);
+			infoLabel = CreateJLabel(infoLabel, windowPanel, message);
 
 			// System.out.println("Data of Buyer Confirmed");
 			conditionFlag_1 = true;
@@ -195,26 +197,37 @@ public class Service extends windowApp implements ActionListener {
 			
 		case "Clear Data":
 			System.out.println(" ");
-
-			// delete existing "confirm" JLabel
-			if (!CheckStatusOfLabel(confirmedOrError, windowPanel)) {
-
-				windowPanel.remove(confirmedOrError);
-				ClearOnlyPanel(windowPanel, confirmedOrError, confirmButton, clearButton, true);
-			}
-
-			// creating JLabel for the delete message
-			confirmedOrError = CreateJLabel(confirmedOrError, windowPanel, "Cleared");
-			// SetButtonsOn();
-			confirmButton.setEnabled(true);
-			clearButton.setEnabled(false);
-			// System.out.println("Clear Data of Seller");
-		case "deleteButton":
-			
+			infoLabel=clearData(infoLabel,windowPanel,confirmButton,clearButton,true);
+//			// delete existing "confirm" JLabel
+//			if (!CheckStatusOfLabel(infoLabel, windowPanel)) {
+//
+//				windowPanel.remove(infoLabel);
+//				ClearOnlyPanel(windowPanel, infoLabel, confirmButton, clearButton, true);
+//			}
+//
+//			// creating JLabel for the delete message
+//			infoLabel = CreateJLabel(infoLabel, windowPanel, "Cleared");
+//			// SetButtonsOn();
+//			confirmButton.setEnabled(true);
+//			clearButton.setEnabled(false);
+//			// System.out.println("Clear Data of Seller");
+		case "Delete the file":
+			message = DeleteFlagGUI(new saveTextFile(), false);
+			infoLabel = deleteTheFile(infoLabel, windowPanel, clearButton, clearButton,
+					message);
 			break;
 		default:
 		}
 	}
+
+
+
+//	@Override
+//	protected void clearData(JLabel infoLabel, JPanel windowPanel, JButton confirmButton, JButton clearButton,
+//			boolean b) {
+//		// TODO Auto-generated method stub
+//		super.clearData(infoLabel, windowPanel, confirmButton, clearButton, b);
+//	}
 
 
 	

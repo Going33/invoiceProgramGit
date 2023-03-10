@@ -30,7 +30,7 @@ public class saveTextFile {
 
 //https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox 
 //pdf creator
-	public void makeAFile(Map<String, String> allDataMap) {
+	public void makeAFile(Map<String, String> allDataMap,int x_pos,int y_pos, int x_Offset, int y_Offset,boolean test) {
 
 		try {
 
@@ -44,18 +44,20 @@ public class saveTextFile {
 				PDDocument document = new PDDocument();
 				document.addPage(new PDPage());
 				// PDPage page = document.getPage(0);
-
+//5,750
+				
 				createAFilePDF(allDataMap, document, document.getPage(0),
-						new PDPageContentStream(document, document.getPage(0)), 5, 750,true);
+						new PDPageContentStream(document, document.getPage(0)), x_pos, y_pos,x_Offset,y_Offset,true,test);
 				System.out.println("PDF file created.");
 
 			} else {
-
+//350 750
 				PDDocument document = PDDocument.load(myObjPDF);
 				createAFilePDF(allDataMap, document, document.getPage(0), new PDPageContentStream(document,
-						document.getPage(0), PDPageContentStream.AppendMode.APPEND, true), 350, 750,false);
+						document.getPage(0), PDPageContentStream.AppendMode.APPEND, true), x_pos, y_pos,x_Offset,y_Offset,false,test);
+				System.out.println("Xpos "+x_pos+"ypos "+y_pos+"x_Offset "+x_Offset+"y_Offset "+y_Offset);
 
-				System.out.println("File already exists. Append new text to existing file.");
+				System.out.println("Append new text to existing file.");
 				// }
 
 			}
@@ -68,28 +70,94 @@ public class saveTextFile {
 
 	/////////////////////////////// to optmize//////////////////////////////
 	public void createAFilePDF(Object object, PDDocument document, PDPage page, PDPageContentStream contentStream,
-			int tX, int tY,boolean setDate) throws IOException {
-
+			int tX, int tY,int x_Offset, int y_Offset,boolean firstWrite, boolean test) throws IOException {
+		int i=0;
 		try {
 			System.out.println("\n");
 			contentStream.beginText();
 
 			// Setting the font to the Content stream
 			contentStream.setFont(PDType1Font.TIMES_ROMAN, fontSizeValue);
-			
+			System.out.println("1 Xpos "+tX+"ypos "+tY+"x_Offset "+x_Offset+"y_Offset "+y_Offset);
 				contentStream.newLineAtOffset(tX, tY);
-				if(setDate)
+				if(firstWrite)
 				{
-					contentStream.newLineAtOffset(tX+530, 30);
+					System.out.println("2 " +"Xpos "+tX+" ypos "+tY+" x_Offset "+x_Offset+" y_Offset "+y_Offset);
+					int wynik = tX+x_Offset;
+					System.out.println(" wynik "+wynik+" tX "+tX+"x_Offset "+x_Offset);
+					contentStream.newLineAtOffset(tX+x_Offset, y_Offset);
 					contentStream.showText(LocalDate.now().toString());
-					contentStream.newLineAtOffset(tX-530, -30);
+					contentStream.newLineAtOffset(tX-x_Offset, -y_Offset);
+				}else {
+					System.out.println("else");
 				}
 						
 
 
-			for (Map.Entry<String, String> set : ((Map<String, String>) object).entrySet()) {
-				contentStream.showText(set.getKey().toString() + " " + set.getValue().toString());
-				contentStream.newLineAtOffset(0, -20);
+
+			
+			if(test)
+			{
+				contentStream.newLineAtOffset(0, -100);
+				contentStream.setFont(PDType1Font.TIMES_ROMAN, 10);
+				for (Map.Entry<String, String> set : ((Map<String, String>) object).entrySet()) {
+				
+					//contentStream.showText("---------|---------");
+//					if(i% 2 == 0)
+//					{
+//					contentStream.showText(set.getKey().toString());
+//					contentStream.newLineAtOffset(0, -20);
+//					contentStream.showText(set.getValue().toString());
+//					contentStream.newLineAtOffset(70, 0);
+//					}else {
+//						contentStream.showText(set.getKey().toString());
+//						contentStream.newLineAtOffset(0, 20);
+//						contentStream.showText(set.getValue().toString());
+//						contentStream.newLineAtOffset(70, 0);
+//					}
+//					
+					if(i<5)
+					{
+						contentStream.showText(set.getKey().toString());
+						
+						contentStream.newLineAtOffset(0, -20);
+						contentStream.showText(set.getValue().toString());
+						contentStream.newLineAtOffset(0, 20);
+						contentStream.newLineAtOffset(130, 0);
+						i=i+1;
+						if(i==5)
+						{
+							contentStream.newLineAtOffset(-650, -50);
+						}
+					}
+					//if(i>=5)
+					else
+					{
+						System.out.println(set.getKey().toString());
+						//contentStream.newLineAtOffset(0, -30);
+						contentStream.showText(set.getKey().toString());
+						
+						contentStream.newLineAtOffset(0, -20);
+						System.out.println(set.getValue().toString());
+						contentStream.showText(set.getValue().toString());
+						contentStream.newLineAtOffset(0, 20);
+						contentStream.newLineAtOffset(130, 0);
+						i=i+1;
+					}
+					
+					
+					//contentStream.showText(set.getValue().toString());
+					
+					
+					System.out.println(i);
+					
+				}
+				
+			}else {
+				for (Map.Entry<String, String> set : ((Map<String, String>) object).entrySet()) {
+					contentStream.showText(set.getKey().toString() + " " + set.getValue().toString());
+					contentStream.newLineAtOffset(0, -20);
+				}
 			}
 			contentStream.endText();
 			contentStream.close();

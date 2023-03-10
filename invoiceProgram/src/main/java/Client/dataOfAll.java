@@ -37,16 +37,16 @@ public class dataOfAll implements SomeInvoiceMethods_DefinitelyItNeedsBetterName
 			infoList.add("04.Company No.:");
 			break;
 		case 3:
-			infoList.add("No.");
-			infoList.add("Name of the goods/service");
-			infoList.add("PKWiU");
-			infoList.add("Qty");
-			infoList.add("Unit");
-			infoList.add("Unit price");
-			infoList.add("VAT rate");
-			infoList.add("Net value");
-			infoList.add("VAT amount");
-			infoList.add("Gross value");
+			infoList.add("01.No.");
+			infoList.add("02.Name of the goods/service");
+			infoList.add("03.PKWiU");
+			infoList.add("04.Qty");
+			infoList.add("05.Unit");
+			infoList.add("06.Unit price");
+			infoList.add("07.VAT rate");
+			infoList.add("08.Net value");
+			infoList.add("09.VAT amount");
+			infoList.add("10.Gross value");
 			break;
 		default:
 			break;
