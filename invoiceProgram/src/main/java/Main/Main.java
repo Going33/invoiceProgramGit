@@ -2,19 +2,16 @@ package Main;
 
 import java.awt.EventQueue;
 
-
-
 public class Main {
-	public static boolean help;
+
 	public static void main(String[] args) {
 		{
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					try {
-						
-					 new GUI.windowApp();
-						
-						
+
+						new GUI.WindowApp();
+
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -22,10 +19,5 @@ public class Main {
 			});
 		}
 
-	
-	
-	
-	
-	
 	}
 }

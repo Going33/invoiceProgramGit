@@ -4,7 +4,7 @@ package Client;
 public interface SomeInvoiceMethods_DefinitelyItNeedsBetterNameInterface {
 	
 
-	void putInInfos(String string1, String string2);
+	void fillUpTheMap(String string1, String string2);
 	void displayInInfos();
 	void deleteDuplicate();
 	void clearTreeMap();

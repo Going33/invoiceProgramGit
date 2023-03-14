@@ -26,7 +26,7 @@ public class Client implements SomeInvoiceMethods_DefinitelyItNeedsBetterNameInt
 	//////////
 	
 	@Override
-	public void putInInfos(String string1, String string2) {
+	public void fillUpTheMap(String string1, String string2) {
 		
 		ClientMap.put(string1, string2);
 	}

@@ -18,7 +18,7 @@ public class FileIO {
 
 	public static Client client=null;
 
-	public static void Read()
+	public static void read()
 	{
 //		Bank bank =null;
 		FileInputStream fis =null;
@@ -45,7 +45,7 @@ public class FileIO {
 		//return bank;
 	}
 
-	public static void Write()
+	public static void write()
 	{
 		try {
 			FileOutputStream fout=new FileOutputStream("data");

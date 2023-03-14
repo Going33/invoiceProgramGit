@@ -3,23 +3,20 @@ package Client;
 import java.util.ArrayList;
 import java.util.List;
 
-public class dataOfAll implements SomeInvoiceMethods_DefinitelyItNeedsBetterNameInterface {
+public class DataOfAll implements SomeInvoiceMethods_DefinitelyItNeedsBetterNameInterface {
 
 	private final List<String> infoList = new ArrayList<String>();
 
-	private int i = 0;
+	private float i = 0;
 
 	/**
-	 * Unification all datas to the one class.
-	 * i=1 - seller
-	 * i=2 - buyer
-	 * i=3 - service
-	 * dataOfSeller, dataOfBuyer and dataOfService have been deleted
+	 * Unification all datas to the one class. i=1 - seller i=2 - buyer i=3 -
+	 * service dataOfSeller, dataOfBuyer and dataOfService have been deleted
 	 */
 
-	public dataOfAll(int i) {
+	public DataOfAll(float i) {
 		this.i = i;
-		switch (i) {
+		switch ((int)i) {
 		case 1:
 			infoList.add("01.Seller:");
 			infoList.add("02.Address:");
@@ -64,7 +61,7 @@ public class dataOfAll implements SomeInvoiceMethods_DefinitelyItNeedsBetterName
 	}
 
 	@Override
-	public void putInInfos(String string1, String string2) {
+	public void fillUpTheMap(String string1, String string2) {
 		// TODO Auto-generated method stub
 
 	}
