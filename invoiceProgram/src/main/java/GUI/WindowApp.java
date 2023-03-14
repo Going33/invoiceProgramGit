@@ -9,12 +9,14 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 import Client.Client;
 import Client.DataOfAll;
@@ -303,6 +305,8 @@ public class WindowApp extends JFrame implements ActionListener {
 			message = deleteFlagGUI(new PDFCreator(), false);
 			infoLabelBottom = deleteTheFile(infoLabelBottom, windowPanelBottom, clearButtonBottom, clearButtonBottom,
 					message);
+			changeData = false;
+			iteratorChangeData =0;
 			break;
 		default:
 	
@@ -336,6 +340,7 @@ public class WindowApp extends JFrame implements ActionListener {
 		// 1 - CHANGE DATA
 		// 2 - clear all
 		int proceed;
+
 		System.out.println("Flagi " + flag + " " + flag1);
 
 	
@@ -358,6 +363,8 @@ public class WindowApp extends JFrame implements ActionListener {
 				proceed = JOptionPane.showOptionDialog(windowFrame,
 						"All data confirmed, pdf file has been updated. Proceed?", "Warning", JOptionPane.DEFAULT_OPTION,
 						JOptionPane.INFORMATION_MESSAGE, null, options2, options2[0]);
+				 setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+			 
 				if(proceed==1)
 				{
 					proceed=2;
@@ -388,6 +395,8 @@ public class WindowApp extends JFrame implements ActionListener {
 				System.out.println("CLEAR ALL " + proceed);
 
 				clearEverything();
+				changeData = false;
+				iteratorChangeData =0;
 				message = deleteFlagGUI(new PDFCreator(), false);
 				infoLabelBottom = deleteTheFile(infoLabelBottom, windowPanelBottom, clearButtonBottom, clearButtonBottom,
 						message);
