@@ -1,8 +1,15 @@
 package Data;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File; // Import the File class
+import java.io.FileOutputStream;
 import java.io.IOException; // Import the IOException class to handle errors
+import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Map;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -22,59 +29,63 @@ public class PDFCreator {
 	private boolean flagDelete;
 	private boolean flagCheck;
 	private int fontSizeValue = 12;
-
+	private byte[] firstArray;
+	private byte[] secondArray;
+	private byte[] thirdArray;
 	/**
 	 * Create pdf file, otherwise overwrite.
 	 */
 	public void makeAFile(Map<String, String> allDataMap, int x_pos, int y_pos, int x_Offset, int y_Offset,
-			boolean addMoney, boolean changeData) {
-		System.out.println("makeAFile funkcja " + changeData);
+			boolean addMoney, boolean changeData, int i) {
+		//System.out.println("makeAFile funkcja " + changeData);
 		try {
 
-			if (changeData == true) {
-				System.out.println("changeData == true " + changeData);
-				PDDocument document = PDDocument.load(myObjPDF);
-				addPaymentInformation(allDataMap, document, document.getPage(0), new PDPageContentStream(document,
-								document.getPage(0), PDPageContentStream.AppendMode.OVERWRITE, true),
-						x_pos, y_pos, x_Offset, y_Offset, false, addMoney,changeData);
-				document.close();
-				//allDataMap=null;
-			} else {
-
 			if (myObjPDF.createNewFile()) {
-				System.out.println("File created: " + myObjPDF.getName());
-				System.out.println(System.getProperty("user.dir"));
+				//System.out.println("File created: " + myObjPDF.getName());
+				//System.out.println(System.getProperty("user.dir"));
 				// create a file
 
 				PDDocument document = new PDDocument();
 
 				document.addPage(new PDPage());
-
+				
 				addPaymentInformation(allDataMap, document, document.getPage(0),
 						new PDPageContentStream(document, document.getPage(0)), x_pos, y_pos, x_Offset, y_Offset, true,
 						addMoney,changeData);
-				System.out.println("PDF file created.");
+				//System.out.println("PDF file created.");
 				document.close();
+				System.out.println(" myObjPDF.createNewFile() writeToByte(firstArray,allDataMap)");
+				firstArray =writeToByte(firstArray,allDataMap);
 				//allDataMap=null;
 			} else {
 				PDDocument document = PDDocument.load(myObjPDF);
+				
+				
+				if(changeData)
+				{
+					addPaymentInformation(allDataMap, document, document.getPage(0), new PDPageContentStream(document,
+							document.getPage(0), PDPageContentStream.AppendMode.OVERWRITE, true),
+					x_pos, y_pos, x_Offset, y_Offset, false, addMoney,changeData);
+				}else {
 				addPaymentInformation(
 						allDataMap, document, document.getPage(0), new PDPageContentStream(document,
 								document.getPage(0), PDPageContentStream.AppendMode.APPEND, true),
 						x_pos, y_pos, x_Offset, y_Offset, false, addMoney,changeData);
-				System.out.println("Xpos " + x_pos + "ypos " + y_pos + "x_Offset " + x_Offset + "y_Offset " + y_Offset);
+				
+				}		
 
-				System.out.println("Append new text to existing file.");
 				document.close();
+				System.out.println(" else myObjPDF.createNewFile() writeToByte(firstArray,allDataMap)");
+				secondArray=writeToByte(secondArray,allDataMap);
 				//allDataMap=null;
 			}
 			
-			}
+			//}
 		} catch (IOException e) {
-			System.out.println("An error occurred.");
+			//System.out.println("An error occurred.");
 			e.printStackTrace();
 		}
-
+		//allDataMap = null;
 	}
 
 	/**
@@ -89,7 +100,7 @@ public class PDFCreator {
 		float j=0;
 
 		try {
-			System.out.println("\n");
+			//System.out.println("\n");
 			contentStream.beginText();
 
 			contentStream.setFont(PDType1Font.TIMES_ROMAN, fontSizeValue);
@@ -98,7 +109,7 @@ public class PDFCreator {
 			 * First write.
 			 */
 
-			if (firstWrite) {
+			if (firstWrite || changeData) {
 				contentStream.newLineAtOffset(tX + x_Offset, y_Offset);
 				contentStream.showText(LocalDate.now().toString());
 				contentStream.newLineAtOffset(tX - x_Offset, -y_Offset);
@@ -142,11 +153,11 @@ public class PDFCreator {
 					}
 
 					else {
-						System.out.println(set.getKey().toString());
+						//System.out.println(set.getKey().toString());
 						contentStream.showText(set.getKey().toString());
 
 						contentStream.newLineAtOffset(0, -20);
-						System.out.println(set.getValue().toString());
+						//System.out.println(set.getValue().toString());
 						contentStream.showText(set.getValue().toString());
 						contentStream.newLineAtOffset(0, 20);
 						contentStream.newLineAtOffset(130, 0);
@@ -170,7 +181,7 @@ public class PDFCreator {
 			document.close();
 
 		} catch (IOException e) {
-			System.out.println("An error occurred.");
+			//System.out.println("An error occurred.");
 			e.printStackTrace();
 		}
 	}
@@ -201,30 +212,43 @@ public class PDFCreator {
 		return flagCheck;
 	}
 
-	public void changeData() throws IOException {
-		String test = "";
-		// Loading an existing document
-		PDDocument document = PDDocument.load(myObjPDF);
-		// Instantiate PDFTextStripper class
-		PDFTextStripper pdfStripper = new PDFTextStripper();
-		// PDPageContentStream contentStream= new
-		// PDPageContentStream(document,document.getPage(0),
-		// PDPageContentStream.AppendMode.OVERWRITE, true);
-		// Retrieving text from PDF document
-		String text = pdfStripper.getText(document);
-//	      
-//	      if(text!=test)
-//	      {
-//	    	  System.out.println("TEXT != TEST");
-//	    	  contentStream.showText(test);
-//	      }else {
-//	    	  System.out.println("TEXT == TEST");
-//	      }
+	private byte[] writeToByte(byte[] tab, Map<String,String> map)
+	{
+	//	tab = new byte[map.size()];
+	       // try catch block
+        try {
+//            FileOutputStream myFileOutStream
+//                = new FileOutputStream("C:\\Users\\Bartek\\eclipse-workspace\\GIT\\invoiceProgram\\newHashMap.txt");
+            ByteArrayOutputStream byteStream = new ByteArrayOutputStream(5000);
+            ObjectOutputStream myObjectOutStream
+                = new ObjectOutputStream(new BufferedOutputStream(byteStream));
+  
+            myObjectOutStream.writeObject(map);
+  
+            // closing FileOutputStream and
+            // ObjectOutputStream
+            myObjectOutStream.close();
+          //  myFileOutStream.close();
+           tab = byteStream.toByteArray();
+           System.out.println(map.size());
+           System.out.println(tab.length);
+           // encode, convert byte[] to base64 encoded string
+           String s = Base64.getEncoder().encodeToString(tab);
 
-		System.out.println(text);
-		// Closing the document
-		document.close();
+          // System.out.println(s);
+           String s1 = new String(tab, StandardCharsets.UTF_8);
+         //  System.out.println("Output : " + s1);
+
+           // decode, convert base64 encoded string back to byte[]
+           byte[] decode = Base64.getDecoder().decode(s);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return tab;
 	}
+	
 	//////////// usuwanie tekstu/edycja///////////
 	// https://stackoverflow.com/questions/63592078/replace-or-remove-text-from-pdf-with-pdfbox-in-java
 }
