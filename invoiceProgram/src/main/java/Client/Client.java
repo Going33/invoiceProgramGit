@@ -3,13 +3,14 @@ package Client;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 
 
 public class Client implements SomeInvoiceMethods_DefinitelyItNeedsBetterNameInterface {
 
-	private Map<String, String> ClientMap = new TreeMap<String, String>();
+	private SortedMap<String, String> ClientMap = new TreeMap<String, String>();
 	private Set<String> keys = ClientMap.keySet(); // The set of keys in the map.
 	private Iterator<String> keyIter = keys.iterator();
 	

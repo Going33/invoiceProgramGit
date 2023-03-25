@@ -7,16 +7,13 @@ public class DataOfAll implements SomeInvoiceMethods_DefinitelyItNeedsBetterName
 
 	private final List<String> infoList = new ArrayList<String>();
 
-	private float i = 0;
-
 	/**
-	 * Unification all datas to the one class. i=1 - seller i=2 - buyer i=3 -
+	 * Unification all datas to the one class. i=1 - seller i=2 - buyer i=3 -......
 	 * service dataOfSeller, dataOfBuyer and dataOfService have been deleted
 	 */
 
 	public DataOfAll(float i) {
-		this.i = i;
-		switch ((int)i) {
+		switch ((int) i) {
 		case 1:
 			infoList.add("01.Seller:");
 			infoList.add("02.Address:");
@@ -44,6 +41,13 @@ public class DataOfAll implements SomeInvoiceMethods_DefinitelyItNeedsBetterName
 			infoList.add("08.Net value");
 			infoList.add("09.VAT amount");
 			infoList.add("10.Gross value");
+			break;
+		case 4:
+			infoList.add("Invoice");
+			infoList.add("No: ");
+			break;
+		case 5:
+			infoList.add("No: ");
 			break;
 		default:
 			break;

@@ -6,18 +6,25 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.Statement;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
+import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
-
 import Client.Client;
 import Client.DataOfAll;
 import Data.PDFCreator;
@@ -25,28 +32,37 @@ import Data.PDFCreator;
 public class WindowApp extends JFrame implements ActionListener {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Frame Variable static - needed to share exactly the same variable between
 	 * parent and child (not a copy of var)
 	 */
 	//
 	private static JFrame windowFrame;
-	private static JPanel windowPanelTop;
-	private static JPanel windowPanelBottom;
-	private JSplitPane windowSplitPanelMainWindow;
-	private int widthWindowMain = 600;
-	private int heightWindowMain = 600;
-	private int rowTop = 2 * (new DataOfAll(1).findSize()) + 3;
-	private int collTop = 1;
-	private int rowBottom = 2 * (new DataOfAll(2).findSize()) + 4;
-	private int collBottom = 1;
-	private static JButton confirmButtonTop;
-	private static JButton clearButtonTop;
-	private static JButton confirmButtonBottom;
-	private static JButton clearButtonBottom;
+	// private static JPanel windowPanelTax;
+	private static JPanel windowPanelSeller;
+	private static JPanel windowPanelBuyer;
+	private JSplitPane windowSplit;
+	private int widthWindowMain = 500;
+	private int heightWindowMain = 500;
+	private int rowTax = 4;
+	private int collTax = 1;
+	private int rowSeller = 2 * (new DataOfAll(1).findSize()) + 3;
+	private int collSeller = 1;
+	private int rowBuyer = 2 * (new DataOfAll(2).findSize()) + 4;
+	private int collBuyer = 1;
+
+	private static JButton confirmButtonSeller;
+	private static JButton clearButtonSeller;
+	private static JButton confirmButtonBuyer;
+	private static JButton clearButtonBuyer;
 	private static JButton deleteButton;
 
-	private static JLabel infoLabelTop;
-	private static JLabel infoLabelBottom;
+	private static JLabel infoLabelSeller;
+	private static JLabel infoLabelBuyer;
+	 JLabel infoLabelTax;
 	private String message = "";
 
 	/**
@@ -55,7 +71,7 @@ public class WindowApp extends JFrame implements ActionListener {
 	//
 	private static boolean conditionFlag_1 = false;
 	private static boolean conditionFlag_2 = false;
-
+	private static boolean conditionFlag_3 = false;
 	private static boolean proceedFlag_1 = false;
 	private static boolean proceedFlag_2 = false;
 
@@ -92,6 +108,126 @@ public class WindowApp extends JFrame implements ActionListener {
 
 	protected void init() {
 
+		/**
+		 * Inner class - TAX INFO.
+		 */
+		class TaxChoiceLocal {
+			private TaxChoiceLocal() {
+				initLocal();
+			}
+
+			private void initLocal() {
+				JFrame windowFrameLocal = new JFrame();
+				
+				windowFrameLocal.setTitle("Tax information");
+				windowFrameLocal.setPreferredSize(new Dimension(300, 300));
+				windowFrameLocal.setLocation(600, 200);
+				windowFrameLocal.pack();
+				windowFrameLocal.setResizable(false);
+				windowFrameLocal.setVisible(true);
+				JPanel windowPanelTax = new JPanel(new GridLayout(rowTax+3, collTax, 0, 0));
+				windowPanelTax.setBackground(Color.GRAY);
+				windowPanelTax.setVisible(true);
+				windowFrameLocal.add(windowPanelTax);
+				VATList(windowPanelTax,4);
+				JButton confirmTax = new JButton("Confirm");
+				JButton deleteTax = new JButton("Delete File");
+				confirmTax.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent evt) {
+						
+						try {
+							
+							
+							 if (pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData))
+							 {
+								 message = "Confirmed. Successfully wrote to the file.";
+									theMiracleOfCreation(pdfObject, windowPanelTax, 4, 5, 750, 530, 30, false, changeData);
+									confirmTax.setText("Close");	
+									confirmTax.setEnabled(true);
+									deleteTax.setEnabled(false);
+									conditionFlag_3 =true;
+									
+									if(confirmTax.getText() == "Close")
+									{
+										 confirmTax.addActionListener((ActionEvent e)->windowFrameLocal.dispose());
+									}
+								}else {
+									message = "File already exists.";
+									confirmTax.setEnabled(false);
+									deleteTax.setEnabled(true);
+								}
+
+
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							message = "Error.";
+							e.printStackTrace();
+						}
+
+
+					//	JLabel infoLabelTax = null;
+						ifcheckStatusOfLabel_TEMP(infoLabelTax, windowPanelTax);
+						infoLabelTax = createJLabel(infoLabelTax, windowPanelTax, message);
+						
+						
+					}
+				});
+			//	
+				
+				deleteTax.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent evt) {
+						
+						try {
+							
+							
+							 if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData))
+							 {
+									message = deleteFlagGUI(new PDFCreator(), false);
+									infoLabelTax = deleteTheFile(infoLabelTax, windowPanelTax, clearButtonBuyer, clearButtonBuyer,
+											message);
+									conditionFlag_3 = false;
+								}
+													
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							message = "Error.";
+							e.printStackTrace();
+						}
+						confirmTax.setEnabled(true);
+						deleteTax.setEnabled(false);
+						ifcheckStatusOfLabel_TEMP(infoLabelTax, windowPanelTax);
+						infoLabelTax = createJLabel(infoLabelTax, windowPanelTax, message);
+					}
+				});
+				
+				windowPanelTax.add(confirmTax);
+				windowPanelTax.add(deleteTax);
+				
+				repaintFrame(windowFrameLocal);
+
+			}
+
+			private JPanel VATList(JPanel windowPanel,int k) {
+				String list[] = { "oo.", "np.", "zw.", "0%", "5%", "7%", "8%", "23%" };
+				JComboBox taxList = new JComboBox(list);
+				for (int i = 0; i < new DataOfAll(k).findSize(); i++) {
+					windowPanel.add(new JLabel(clientObjectChoice(i, 4)));
+					if (i == 0) {
+
+						windowPanel.add(taxList);
+					} else {
+						LocalDate today = LocalDate.now();
+						DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						String formattedDate = today.format(dateTimeFormatter);  //17-02-2022
+						windowPanel.add(new JTextField(formattedDate));
+					}
+
+				}
+				return windowPanel;
+			}
+
+		}
+
 		windowFrame = new JFrame();
 
 		windowFrame.setTitle("Invoice Program [1]");
@@ -101,63 +237,86 @@ public class WindowApp extends JFrame implements ActionListener {
 		windowFrame.pack();
 		windowFrame.setResizable(false);
 		windowFrame.setVisible(true);
+		new TaxChoiceLocal();
 
+
+		// panelDisplay(windowPanelTax, 5);
+		// windowPanelTax.setVisible(true);
+		// windowFrame.add(windowPanelTax);
 		/**
 		 * TOP PANEL.
 		 */
 
-		windowPanelTop = new JPanel(new GridLayout(rowTop, collTop, 0, 0));
-		windowPanelTop.setBackground(Color.WHITE);
+		windowPanelSeller = new JPanel(new GridLayout(rowSeller, collSeller, 5, 0));
+		windowPanelSeller.setBackground(Color.WHITE);
+		// windowPanelSeller.add(windowPanelTax);
+		panelDisplay(windowPanelSeller, 1);
 
-		panelDisplay(windowPanelTop, 1);
+		confirmButtonSeller = new JButton("Confirm Data of Seller");
+		clearButtonSeller = new JButton("Clear Data of Seller");
 
-		confirmButtonTop = new JButton("Confirm Data of Seller");
-		clearButtonTop = new JButton("Clear Data of Seller");
-
-		confirmButtonTop.addActionListener(this);
-		windowPanelTop.add(confirmButtonTop);
-		clearButtonTop.addActionListener(this);
-		windowPanelTop.add(clearButtonTop);
-		clearButtonTop.setEnabled(false);
+		confirmButtonSeller.addActionListener(this);
+		windowPanelSeller.add(confirmButtonSeller);
+		clearButtonSeller.addActionListener(this);
+		windowPanelSeller.add(clearButtonSeller);
+		clearButtonSeller.setEnabled(false);
 
 		/**
 		 * BOTTOM PANEL.
 		 */
 
-		windowPanelBottom = new JPanel(new GridLayout(rowBottom, collBottom, 0, 0));
-		windowPanelBottom.setBackground(Color.GRAY);
+		windowPanelBuyer = new JPanel(new GridLayout(rowBuyer, collBuyer, 0, 0));
+		windowPanelBuyer.setBackground(Color.GRAY);
 
-		panelDisplay(windowPanelBottom, 2);
+		panelDisplay(windowPanelBuyer, 2);
 
-		confirmButtonBottom = new JButton("Confirm Data of Buyer");
-		clearButtonBottom = new JButton("Clear Data of Buyer");
+		confirmButtonBuyer = new JButton("Confirm Data of Buyer");
+		clearButtonBuyer = new JButton("Clear Data of Buyer");
 		deleteButton = new JButton("Delete the file");
 
-		confirmButtonBottom.addActionListener(this);
-		windowPanelBottom.add(confirmButtonBottom);
+		confirmButtonBuyer.addActionListener(this);
+		windowPanelBuyer.add(confirmButtonBuyer);
 
-		clearButtonBottom.addActionListener(this);
-		windowPanelBottom.add(clearButtonBottom);
-		clearButtonBottom.setEnabled(false);
+		clearButtonBuyer.addActionListener(this);
+		windowPanelBuyer.add(clearButtonBuyer);
+		clearButtonBuyer.setEnabled(false);
 
 		deleteButton.addActionListener(this);
-		windowPanelBottom.add(deleteButton);
+		windowPanelBuyer.add(deleteButton);
 
-		windowPanelBottom.setVisible(true);
-		windowPanelTop.setVisible(true);
+		windowPanelBuyer.setVisible(true);
+		windowPanelSeller.setVisible(true);
 
-		windowSplitPanelMainWindow = new JSplitPane();
-		windowSplitPanelMainWindow.setPreferredSize(windowFrame.getSize());
-		windowSplitPanelMainWindow.setDividerSize(0);
-		windowSplitPanelMainWindow.setDividerLocation((windowFrame.getSize().width) / 2);
-		windowSplitPanelMainWindow.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		windowSplitPanelMainWindow.setBottomComponent(windowPanelBottom);
-		windowSplitPanelMainWindow.setTopComponent(windowPanelTop);
-		windowSplitPanelMainWindow.setVisible(true);
+		Dimension maxSize;
 
-		windowFrame.add(windowSplitPanelMainWindow);
+		// windowPanelTax.setMaximumSize(new Dimension(widthWindowMain, 30));
+		// windowPanelSeller.setMaximumSize(new Dimension(widthWindowMain, 570));
+		// windowPanelBuyer.setMaximumSize(new Dimension(widthWindowMain, 360));
 
-		repaintFrame();
+		// JPanel newPanel = new JPanel(new GridLayout(3, 1,0, 0));
+
+		// newPanel.add(windowPanelTax);
+		// newPanel.add(windowPanelSeller);
+		// newPanel.add(windowPanelBuyer);
+		// windowFrame.add(newPanel);
+		// windowPanelSeller.setSize(widthWindowMain, 570);
+		// windowPanelBuyer.setSize(widthWindowMain, 360);
+//		windowFrame.add(windowPanelTax);
+		// windowFrame.add(windowPanelSeller);
+		// windowFrame.add(windowPanelBuyer);
+
+		windowSplit = new JSplitPane();
+		windowSplit.setPreferredSize(windowFrame.getSize());
+		windowSplit.setDividerSize(0);
+		windowSplit.setDividerLocation((windowFrame.getSize().width) / 2);
+		windowSplit.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		windowSplit.setTopComponent(windowPanelSeller);
+		windowSplit.setBottomComponent(windowPanelBuyer);
+		windowSplit.setVisible(true);
+
+		windowFrame.add(windowSplit);
+
+		repaintFrame(windowFrame);
 
 	}
 
@@ -170,7 +329,7 @@ public class WindowApp extends JFrame implements ActionListener {
 		try {
 			doTheThings_actionPerformed(e);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
+
 			e1.printStackTrace();
 		}
 
@@ -183,36 +342,34 @@ public class WindowApp extends JFrame implements ActionListener {
 
 			try {
 				// TODO TO OPTIMIZE!!!!!!!!!!!!!
-				System.out.println("pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && !conditionFlag_1 && !conditionFlag_2 "+pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) + conditionFlag_1 + conditionFlag_2);
+				System.out.println(
+						"pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && !conditionFlag_1 && !conditionFlag_2 "
+								+ pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) + conditionFlag_1
+								+ conditionFlag_2);
 				if (pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && !conditionFlag_1 && !conditionFlag_2) {
-
-					// System.out.println("1.JESTEM TUTAJ "
-					// +pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) );
-;
-					theMiracleOfCreation(pdfObject, windowPanelTop, 1, 5, 750, 530, 30, false, changeData, 1);
+					theMiracleOfCreation(pdfObject, windowPanelSeller, 1, 5, 750, 530, 30, false, changeData);
 					message = "Confirmed. Successfully wrote to the file.";
 					conditionFlag_1 = true;
 					conditionFlag_2 = false;
-					confirmButtonTop.setEnabled(false);
-					clearButtonTop.setEnabled(true);
+					confirmButtonSeller.setEnabled(false);
+					clearButtonSeller.setEnabled(false);
 
 				} else {
 
-					if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && !conditionFlag_1
-							&& conditionFlag_2) {
-
-						// System.out.println("2.JESTEM TUTAJ "
-						// +pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) );
-						theMiracleOfCreation(pdfObject, windowPanelTop, 1, 5, 750, 530, 30, false, changeData, 1);
+					if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && ((!conditionFlag_1
+							&& conditionFlag_2) || conditionFlag_3 )) {
+						theMiracleOfCreation(pdfObject, windowPanelSeller, 1, 5, 750, 530, 30, false, changeData);
 						message = "Append data to the file.";
-						confirmButtonTop.setEnabled(false);
-						clearButtonTop.setEnabled(true);
+						confirmButtonSeller.setEnabled(false);
+						clearButtonSeller.setEnabled(false);
+						conditionFlag_1 = true;
 						conditionFlag_2 = false;
+						conditionFlag_3 =false;
 					} else {
-						if(!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData))
-						{
+						if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData)) {
 							message = "Old file already exists. Cannot overwrite.";
-						}else {
+							setButtonsOff();
+						} else {
 							message = "Error";
 						}
 					}
@@ -224,12 +381,11 @@ public class WindowApp extends JFrame implements ActionListener {
 
 			}
 
-			
-///////////////////////////////////////////////just for now, gonna be delete in future////
-			ifcheckStatusOfLabel_TEMP(infoLabelTop, windowPanelTop);
-///////////////////////////////////////////////just for now, gonna be delete in future////
+///////////////////////////////////////////////just for now, gonna be deleted in the future////
+			ifcheckStatusOfLabel_TEMP(infoLabelSeller, windowPanelSeller);
+///////////////////////////////////////////////just for now, gonna be deleted in the future////
 
-			infoLabelTop = createJLabel(infoLabelTop, windowPanelTop, message);
+			infoLabelSeller = createJLabel(infoLabelSeller, windowPanelSeller, message);
 
 			proceedFlag_1 = true;
 			changeData = false;
@@ -238,32 +394,34 @@ public class WindowApp extends JFrame implements ActionListener {
 		case "Confirm Data of Buyer":
 			try {
 
-				if (pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && !conditionFlag_1 && !conditionFlag_2) {
+				if (pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && !conditionFlag_1 && !conditionFlag_2 ) {
 					message = "Confirmed. Successfully wrote to the file.";
 
-					theMiracleOfCreation(pdfObject, windowPanelBottom, 2, 350, 750, 0, 0, false, changeData, 2);
+					theMiracleOfCreation(pdfObject, windowPanelBuyer, 2, 350, 750, 0, 0, false, changeData);
 
 					conditionFlag_1 = false;
 					conditionFlag_2 = true;
-					confirmButtonBottom.setEnabled(false);
-					clearButtonBottom.setEnabled(true);
+					confirmButtonBuyer.setEnabled(false);
+					clearButtonBuyer.setEnabled(false);
 				} else {
-					if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && conditionFlag_1
-							&& !conditionFlag_2) {
+					if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && ((conditionFlag_1
+							&& !conditionFlag_2) || conditionFlag_3)) {
 
-						theMiracleOfCreation(pdfObject, windowPanelBottom, 2, 350, 750, 0, 0, false, changeData, 2);
+						theMiracleOfCreation(pdfObject, windowPanelBuyer, 2, 350, 750, 0, 0, false, changeData);
 						message = "Append data to the file.";
-						confirmButtonBottom.setEnabled(false);
-						clearButtonBottom.setEnabled(true);
+						confirmButtonBuyer.setEnabled(false);
+						clearButtonBuyer.setEnabled(false);
 						conditionFlag_1 = false;
+						conditionFlag_2 = true;
+						conditionFlag_3 =false;
 					} else {
-						if(!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData))
-						{
+						if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData)) {
 							message = "Old file already exists. Cannot overwrite.";
-						}else {
+							setButtonsOff();
+						} else {
 							message = "Error";
 						}
-						
+
 						setButtonsOff();
 					}
 				}
@@ -275,11 +433,11 @@ public class WindowApp extends JFrame implements ActionListener {
 
 			}
 
-///////////////////////////////////////////////just for now, gonna be delete in future////
-			ifcheckStatusOfLabel_TEMP(infoLabelBottom, windowPanelBottom);
-///////////////////////////////////////////////just for now, gonna be delete in future////		
+///////////////////////////////////////////////just for now, gonna be deleted in the future////
+			ifcheckStatusOfLabel_TEMP(infoLabelBuyer, windowPanelBuyer);
+///////////////////////////////////////////////just for now, gonna be deleted in the future////		
 
-			infoLabelBottom = createJLabel(infoLabelBottom, windowPanelBottom, message);
+			infoLabelBuyer = createJLabel(infoLabelBuyer, windowPanelBuyer, message);
 
 			proceedFlag_2 = true;
 			changeData = false;
@@ -287,18 +445,18 @@ public class WindowApp extends JFrame implements ActionListener {
 
 		case "Clear Data of Seller":
 
-			infoLabelTop = clearData(infoLabelTop, windowPanelTop, confirmButtonTop, clearButtonTop, true);
+			infoLabelSeller = clearData(infoLabelSeller, windowPanelSeller, confirmButtonSeller, clearButtonSeller,
+					true);
 			break;
 
 		case "Clear Data of Buyer":
 
-			infoLabelBottom = clearData(infoLabelBottom, windowPanelBottom, confirmButtonBottom, clearButtonBottom,
-					true);
+			infoLabelBuyer = clearData(infoLabelBuyer, windowPanelBuyer, confirmButtonBuyer, clearButtonBuyer, true);
 			break;
 		case "Delete the file":
 
 			message = deleteFlagGUI(new PDFCreator(), false);
-			infoLabelBottom = deleteTheFile(infoLabelBottom, windowPanelBottom, clearButtonBottom, clearButtonBottom,
+			infoLabelBuyer = deleteTheFile(infoLabelBuyer, windowPanelBuyer, clearButtonSeller, clearButtonBuyer,
 					message);
 			changeData = false;
 			iteratorChangeData = 0;
@@ -307,9 +465,9 @@ public class WindowApp extends JFrame implements ActionListener {
 
 		}
 
-		repaintFrame();
-		
-		nextWindow(proceedFlag_1, proceedFlag_2,changeData,iteratorChangeData,pdfObject,windowFrame);
+		repaintFrame(windowFrame);
+
+		nextWindow(proceedFlag_1, proceedFlag_2, changeData, iteratorChangeData, pdfObject, windowFrame);
 
 	}
 
@@ -326,12 +484,14 @@ public class WindowApp extends JFrame implements ActionListener {
 
 	/**
 	 * Next Window Decision.
-	 * @param windowFrame 
+	 * 
+	 * @param windowFrame
 	 * 
 	 * @throws IOException
 	 */
 
-	void nextWindow(boolean flag, boolean flag1,boolean changeData2, int iteratorChangeData2, PDFCreator pdfObject2, JFrame windowFrame2 ) throws IOException {
+	void nextWindow(boolean flag, boolean flag1, boolean changeData2, int iteratorChangeData2, PDFCreator pdfObject2,
+			JFrame windowFrame2) throws IOException {
 		// boolean flaghelp = false;
 		// 0 - yes
 		// 1 - CHANGE DATA
@@ -374,8 +534,8 @@ public class WindowApp extends JFrame implements ActionListener {
 				break;
 			case 1:
 				// System.out.println("CHANGE DATA " + proceed);
-				// confirmButtonTop.addActionListener(e -> DoTheThings_actionPerformed(e));
-				// confirmButtonBottom.addActionListener(e -> DoTheThings_actionPerformed(e));
+				// confirmButtonSeller.addActionListener(e -> DoTheThings_actionPerformed(e));
+				// confirmButtonBuyer.addActionListener(e -> DoTheThings_actionPerformed(e));
 				// deleteButton.addActionListener(e ->deleteFlagGUI(new saveTextFile(), false));
 				// windowFrame.dispose();
 				// init();
@@ -391,8 +551,8 @@ public class WindowApp extends JFrame implements ActionListener {
 				changeData = false;
 				iteratorChangeData = 0;
 				message = deleteFlagGUI(new PDFCreator(), false);
-				infoLabelBottom = deleteTheFile(infoLabelBottom, windowPanelBottom, clearButtonBottom,
-						clearButtonBottom, message);
+				infoLabelBuyer = deleteTheFile(infoLabelBuyer, windowPanelBuyer, clearButtonBuyer, clearButtonBuyer,
+						message);
 				// TODO
 				// changeData = false;
 				break;
@@ -407,14 +567,14 @@ public class WindowApp extends JFrame implements ActionListener {
 				proceed = JOptionPane.showOptionDialog(windowFrame, "File dosen't exist!", "Warning",
 						JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 				clearEverything();
-			//	windowFrame.dispose();
+				// windowFrame.dispose();
 			}
 		}
 		// return flaghelp;
 	}
 
 	/**
-	 * Creating specific Object - Client (Seller or Buyer)
+	 * Creating specific Object [1]
 	 */
 
 	Client createClientObject(Client clientInInfos, JPanel windowPanel, int clientchoice) {
@@ -456,16 +616,16 @@ public class WindowApp extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * Creating specific Object - Client (Seller or Buyer) [2]
+	 * Creating specific Object [2]
 	 */
 
 	protected void theMiracleOfCreation(PDFCreator object, JPanel windowPanel, int clientchoice, int x_pos, int y_pos,
-			int x_Offset, int y_Offset, boolean addMoney, boolean changeData, int i) {
+			int x_Offset, int y_Offset, boolean addMoney, boolean changeData) {
 		// just do the things
 		// createClientObject(new Client(), windowPanel, decision).displayInInfos();
 		createClientObject(new Client(), windowPanel, clientchoice);
 		object.makeAFile(createClientObject(new Client(), windowPanel, clientchoice).getClientMap(), x_pos, y_pos,
-				x_Offset, y_Offset, addMoney, changeData, i);
+				x_Offset, y_Offset, addMoney, changeData);
 
 	}
 
@@ -513,7 +673,7 @@ public class WindowApp extends JFrame implements ActionListener {
 	 * Repainting the Frame
 	 */
 
-	static void repaintFrame() {
+	protected static void repaintFrame(JFrame windowFrame) {
 		windowFrame.invalidate();
 		windowFrame.validate();
 		windowFrame.repaint();
@@ -574,7 +734,7 @@ public class WindowApp extends JFrame implements ActionListener {
 		}
 		// clearEverything();
 		// setFlagsFalse();
-		repaintFrame();
+		repaintFrame(windowFrame);
 		BtnConfirm.setEnabled(true);
 		BtnClear.setEnabled(false);
 
@@ -585,12 +745,12 @@ public class WindowApp extends JFrame implements ActionListener {
 	 */
 	static void clearEverything() {
 
-		clearOnlyPanel(windowPanelTop, infoLabelTop, confirmButtonTop, clearButtonTop, false);
-		clearOnlyPanel(windowPanelBottom, infoLabelBottom, confirmButtonBottom, clearButtonBottom, false);
+		clearOnlyPanel(windowPanelSeller, infoLabelSeller, confirmButtonSeller, clearButtonSeller, false);
+		clearOnlyPanel(windowPanelBuyer, infoLabelBuyer, confirmButtonBuyer, clearButtonBuyer, false);
 
 		setFlagsFalse();
 		setButtonsOn();
-		repaintFrame();
+		repaintFrame(windowFrame);
 	}
 
 	/**
@@ -604,17 +764,17 @@ public class WindowApp extends JFrame implements ActionListener {
 	}
 
 	static void setButtonsOn() {
-		confirmButtonTop.setEnabled(true);
-		clearButtonTop.setEnabled(true);
-		confirmButtonBottom.setEnabled(true);
-		clearButtonBottom.setEnabled(true);
+		confirmButtonSeller.setEnabled(true);
+		clearButtonSeller.setEnabled(true);
+		confirmButtonBuyer.setEnabled(true);
+		clearButtonBuyer.setEnabled(true);
 	}
 
 	static void setButtonsOff() {
-		confirmButtonTop.setEnabled(false);
-		clearButtonTop.setEnabled(false);
-		confirmButtonBottom.setEnabled(false);
-		clearButtonBottom.setEnabled(false);
+		confirmButtonSeller.setEnabled(false);
+		clearButtonSeller.setEnabled(false);
+		confirmButtonBuyer.setEnabled(false);
+		clearButtonBuyer.setEnabled(false);
 	}
 
 	/**
