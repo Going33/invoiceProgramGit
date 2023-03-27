@@ -43,10 +43,7 @@ public class DataOfAll implements SomeInvoiceMethods_DefinitelyItNeedsBetterName
 			infoList.add("10.Gross value");
 			break;
 		case 4:
-			infoList.add("Invoice");
-			infoList.add("No: ");
-			break;
-		case 5:
+			infoList.add("VAT %");
 			infoList.add("No: ");
 			break;
 		default:

@@ -30,13 +30,15 @@ public class Service extends WindowApp implements ActionListener {
 	private static JLabel infoLabel;
 	private int widthWindowMain = (int) (37.5 * new DataOfAll(3).findSize());// 600
 	private int heightWindowMain = (int) (37.5 * new DataOfAll(3).findSize());
-	private int row = 2 * (new DataOfAll(3).findSize()) + 4;
+	private int row = 2 * (new DataOfAll(3).findSize()) + 5;
 	private int coll = 1;
 	private static final long serialVersionUID = 1L;
 	private static JButton confirmButton;
 	private static JButton clearButton;
 	private static JButton deleteButton;
+	private static JButton closeButton;
 	private String message = "";
+	private String VATValue;
 	final private String absPathPDF = System.getProperty("user.dir") + "\\Invoice_" + LocalDate.now() + ".pdf";
 
 	private static boolean conditionFlag_1 = false;
@@ -50,8 +52,10 @@ public class Service extends WindowApp implements ActionListener {
 //	private windowApp objectForStealMethos = new windowApp(0);
 //	DataOfAll serviceInfo = new DataOfAll(3);
 
-	public Service(int i) {
-		super(0);
+	public Service(String VATValue) {
+		super(VATValue);
+		//this.VATValue = VATValue;
+		//System.out.println("Service "+VATValue);
 		init();
 	}
 
@@ -63,7 +67,7 @@ public class Service extends WindowApp implements ActionListener {
 		windowFrame.setTitle("Invoice Program [2]");
 		windowFrame.setPreferredSize(new Dimension(widthWindowMain, heightWindowMain));
 		windowFrame.setLocation(500, 100);
-		windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		windowFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		windowFrame.pack();
 		windowFrame.setResizable(false);
 		windowFrame.setVisible(true);
@@ -78,10 +82,16 @@ public class Service extends WindowApp implements ActionListener {
 		confirmButton = new JButton("Confirm Data");
 		clearButton = new JButton("Clear Data");
 		deleteButton = new JButton("Delete the file");
-
+		closeButton = new JButton("Close");
+		
+		
 		confirmButton.addActionListener(this);
 		windowPanel.add(confirmButton);
-
+		
+		closeButton.addActionListener(this);
+		windowPanel.add(closeButton);
+		
+		
 		clearButton.addActionListener(this);
 		windowPanel.add(clearButton);
 
@@ -91,6 +101,7 @@ public class Service extends WindowApp implements ActionListener {
 		confirmButton.setEnabled(true);
 		clearButton.setEnabled(true);
 		deleteButton.setEnabled(true);
+		
 
 	}
 
@@ -120,7 +131,12 @@ public class Service extends WindowApp implements ActionListener {
 					confirmButton, clearButton, deleteButton, windowFrame, message);
 
 			conditionFlag_1 = true;
-
+			confirmButton.setEnabled(false);
+//			confirmButton.setText("Close");
+//			if(confirmButton.getText() == "Close")
+//			{
+//				confirmButton.addActionListener((ActionEvent ev)->windowFrame.dispose());
+//			}
 			break;
 		case "Overwrite":
 
@@ -150,7 +166,7 @@ public class Service extends WindowApp implements ActionListener {
 			// System.out.println("Tutaj Overwrite " +changeData);
 			infoLabel = confirmOrOverwrite(options, changeData, conditionFlag_1, pdfObject, windowPanel, infoLabel,
 					confirmButton, clearButton, deleteButton, windowFrame, message);
-
+			confirmButton.setEnabled(false);
 			// System.out.println("conditionFlag_1 " + proceedFlag_2);
 			break;
 		case "Clear Data":
@@ -158,6 +174,7 @@ public class Service extends WindowApp implements ActionListener {
 			//////////
 			// does not work correctly yet
 			confirmButton.setText("Overwrite");
+			confirmButton.setEnabled(true);
 			changeData = false;
 			/////////
 			// System.out.println("Tutaj Clear Data " +changeData);
@@ -171,6 +188,8 @@ public class Service extends WindowApp implements ActionListener {
 			confirmButton.setEnabled(false);
 			clearButton.setEnabled(false);
 			break;
+		case "Close":
+			windowFrame.dispose();
 		default:
 		}
 	}
@@ -203,9 +222,9 @@ public class Service extends WindowApp implements ActionListener {
 
 				if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData)) {
 					// pos x,pos y pos_x offset, pos_y offset
-					theMiracleOfCreation(pdfObject, windowPanel, 3, 5, 550, 0, 0, true, changeData);
+					theMiracleOfCreation(pdfObject, windowPanel, 3, 5, 500, 0, 0, true, changeData);
 					message = "Append data to the file.";
-					confirmButton.setEnabled(false);
+					confirmButton.setEnabled(true);
 					clearButton.setEnabled(true);
 					conditionFlag_1 = true;
 
@@ -233,4 +252,5 @@ public class Service extends WindowApp implements ActionListener {
 		return infoLabel = createJLabel(infoLabel, windowPanel, message);
 	}
 
+	
 }

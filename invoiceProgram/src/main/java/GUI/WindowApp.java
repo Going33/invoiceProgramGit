@@ -6,25 +6,19 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.Statement;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-
-import javax.swing.BoxLayout;
-import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
+
 import Client.Client;
 import Client.DataOfAll;
 import Data.PDFCreator;
@@ -47,11 +41,10 @@ public class WindowApp extends JFrame implements ActionListener {
 	private JSplitPane windowSplit;
 	private int widthWindowMain = 500;
 	private int heightWindowMain = 500;
-	private int rowTax = 4;
-	private int collTax = 1;
+
 	private int rowSeller = 2 * (new DataOfAll(1).findSize()) + 3;
 	private int collSeller = 1;
-	private int rowBuyer = 2 * (new DataOfAll(2).findSize()) + 4;
+	private int rowBuyer = 2 * (new DataOfAll(2).findSize()) + 5;
 	private int collBuyer = 1;
 
 	private static JButton confirmButtonSeller;
@@ -59,10 +52,11 @@ public class WindowApp extends JFrame implements ActionListener {
 	private static JButton confirmButtonBuyer;
 	private static JButton clearButtonBuyer;
 	private static JButton deleteButton;
+	private static JButton closeButton;
 
 	private static JLabel infoLabelSeller;
 	private static JLabel infoLabelBuyer;
-	 JLabel infoLabelTax;
+
 	private String message = "";
 
 	/**
@@ -77,6 +71,8 @@ public class WindowApp extends JFrame implements ActionListener {
 
 	private static boolean changeData = false;
 	private static int iteratorChangeData = 0;
+	private String VATValue = "";
+	private String nettoValue = "";
 
 	/**
 	 * Creating objects.
@@ -98,8 +94,8 @@ public class WindowApp extends JFrame implements ActionListener {
 	 * possible to call the "zero" constructor and override the remainder method
 	 * without any issues.
 	 */
-	public WindowApp(int i) {
-
+	public WindowApp(String VATValue) {
+		this.VATValue = VATValue;
 	}
 
 	/**
@@ -111,52 +107,66 @@ public class WindowApp extends JFrame implements ActionListener {
 		/**
 		 * Inner class - TAX INFO.
 		 */
+
 		class TaxChoiceLocal {
+
+			private JLabel infoLabelTax;
+			private JButton confirmTax;
+			private JButton deleteTax;
+			private JButton closeTax;
+			private int rowTax = 8;
+			private int collTax = 1;
+			private String taxValue = "";
+			JPanel windowPanelTax;
+			JFrame windowFrameLocal;
+			String list[] = { "oo.", "np.", "zw.", "0%", "5%", "7%", "8%", "23%" };
+			JComboBox<Object> taxList = new JComboBox<Object>(list);
+
 			private TaxChoiceLocal() {
 				initLocal();
 			}
 
 			private void initLocal() {
-				JFrame windowFrameLocal = new JFrame();
-				
+
+				windowFrameLocal = new JFrame();
+				// windowFrameLocal.setAlwaysOnTop(true);
 				windowFrameLocal.setTitle("Tax information");
 				windowFrameLocal.setPreferredSize(new Dimension(300, 300));
 				windowFrameLocal.setLocation(600, 200);
+				windowFrameLocal.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 				windowFrameLocal.pack();
 				windowFrameLocal.setResizable(false);
 				windowFrameLocal.setVisible(true);
-				JPanel windowPanelTax = new JPanel(new GridLayout(rowTax+3, collTax, 0, 0));
+				windowPanelTax = new JPanel(new GridLayout(rowTax, collTax, 0, 0));
 				windowPanelTax.setBackground(Color.GRAY);
 				windowPanelTax.setVisible(true);
 				windowFrameLocal.add(windowPanelTax);
-				VATList(windowPanelTax,4);
-				JButton confirmTax = new JButton("Confirm");
-				JButton deleteTax = new JButton("Delete File");
+				confirmTax = new JButton("Confirm");
+				deleteTax = new JButton("Delete File");
+				closeTax = new JButton("Close");
+				taxValue = VATListPanel(windowPanelTax, 4);
+
+				repaintFrame(windowFrameLocal);
+
 				confirmTax.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						
-						try {
-							
-							
-							 if (pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData))
-							 {
-								 message = "Confirmed. Successfully wrote to the file.";
-									theMiracleOfCreation(pdfObject, windowPanelTax, 4, 5, 750, 530, 30, false, changeData);
-									confirmTax.setText("Close");	
-									confirmTax.setEnabled(true);
-									deleteTax.setEnabled(false);
-									conditionFlag_3 =true;
-									
-									if(confirmTax.getText() == "Close")
-									{
-										 confirmTax.addActionListener((ActionEvent e)->windowFrameLocal.dispose());
-									}
-								}else {
-									message = "File already exists.";
-									confirmTax.setEnabled(false);
-									deleteTax.setEnabled(true);
-								}
 
+						try {
+
+							if (pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData)) {
+								message = "Confirmed. Successfully wrote to the file.";
+
+								theMiracleOfCreation(pdfObject, windowPanelTax, 4, 75, 750, 350, 30, false, changeData);
+								// confirmTax.setText("Close");
+								confirmTax.setEnabled(false);
+								deleteTax.setEnabled(false);
+
+								// System.out.println(taxValue);
+							} else {
+								message = "File already exists.";
+								confirmTax.setEnabled(false);
+								deleteTax.setEnabled(true);
+							}
 
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -164,30 +174,27 @@ public class WindowApp extends JFrame implements ActionListener {
 							e.printStackTrace();
 						}
 
-
-					//	JLabel infoLabelTax = null;
+						// JLabel infoLabelTax = null;
 						ifcheckStatusOfLabel_TEMP(infoLabelTax, windowPanelTax);
 						infoLabelTax = createJLabel(infoLabelTax, windowPanelTax, message);
-						
-						
+
 					}
 				});
-			//	
-				
+
 				deleteTax.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						
+
 						try {
-							
-							
-							 if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData))
-							 {
-									message = deleteFlagGUI(new PDFCreator(), false);
-									infoLabelTax = deleteTheFile(infoLabelTax, windowPanelTax, clearButtonBuyer, clearButtonBuyer,
-											message);
-									conditionFlag_3 = false;
-								}
-													
+
+							if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData)) {
+								message = deleteFlagGUI(new PDFCreator(), false);
+								infoLabelTax = deleteTheFile(infoLabelTax, windowPanelTax, clearButtonBuyer,
+										clearButtonBuyer, message);
+								setButtonsOff();
+								// deleteButton.setEnabled(false);
+								conditionFlag_3 = false;
+							}
+
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							message = "Error.";
@@ -199,31 +206,57 @@ public class WindowApp extends JFrame implements ActionListener {
 						infoLabelTax = createJLabel(infoLabelTax, windowPanelTax, message);
 					}
 				});
-				
+
+				closeTax.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						conditionFlag_3 = true;
+						setButtonsOn();
+
+						closeButton.setEnabled(true);
+						windowFrameLocal.dispose();
+
+					}
+				});
+
 				windowPanelTax.add(confirmTax);
 				windowPanelTax.add(deleteTax);
-				
-				repaintFrame(windowFrameLocal);
+				windowPanelTax.add(closeTax);
 
 			}
 
-			private JPanel VATList(JPanel windowPanel,int k) {
-				String list[] = { "oo.", "np.", "zw.", "0%", "5%", "7%", "8%", "23%" };
-				JComboBox taxList = new JComboBox(list);
+			/**
+			 * VATListPanel - 4 from DataOfAll
+			 */
+
+			private String VATListPanel(JPanel windowPanel, int k) {
+
 				for (int i = 0; i < new DataOfAll(k).findSize(); i++) {
 					windowPanel.add(new JLabel(clientObjectChoice(i, 4)));
 					if (i == 0) {
+						// windowPanel.add(new JTextField(" "));
 
 						windowPanel.add(taxList);
+						confirmTax.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								taxValue = taxList.getItemAt(taxList.getSelectedIndex()).toString();
+								VATValue = taxValue;
+
+								// ifcheckStatusOfLabel_TEMP(infoLabelTax, windowPanel);
+								// infoLabelTax = createJLabel(infoLabelTax, windowPanel, message);
+
+							}
+						});
+
 					} else {
 						LocalDate today = LocalDate.now();
 						DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-						String formattedDate = today.format(dateTimeFormatter);  //17-02-2022
-						windowPanel.add(new JTextField(formattedDate));
+						String formattedDate = today.format(dateTimeFormatter); // 17-02-2022
+						windowPanel.add(new JTextField(formattedDate + "_"));
 					}
 
 				}
-				return windowPanel;
+
+				return taxValue;
 			}
 
 		}
@@ -233,12 +266,11 @@ public class WindowApp extends JFrame implements ActionListener {
 		windowFrame.setTitle("Invoice Program [1]");
 		windowFrame.setPreferredSize(new Dimension(widthWindowMain, heightWindowMain));
 		windowFrame.setLocation(500, 100);
-		windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		windowFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		windowFrame.pack();
 		windowFrame.setResizable(false);
 		windowFrame.setVisible(true);
 		new TaxChoiceLocal();
-
 
 		// panelDisplay(windowPanelTax, 5);
 		// windowPanelTax.setVisible(true);
@@ -249,7 +281,6 @@ public class WindowApp extends JFrame implements ActionListener {
 
 		windowPanelSeller = new JPanel(new GridLayout(rowSeller, collSeller, 5, 0));
 		windowPanelSeller.setBackground(Color.WHITE);
-		// windowPanelSeller.add(windowPanelTax);
 		panelDisplay(windowPanelSeller, 1);
 
 		confirmButtonSeller = new JButton("Confirm Data of Seller");
@@ -272,7 +303,8 @@ public class WindowApp extends JFrame implements ActionListener {
 
 		confirmButtonBuyer = new JButton("Confirm Data of Buyer");
 		clearButtonBuyer = new JButton("Clear Data of Buyer");
-		deleteButton = new JButton("Delete the file");
+		// deleteButton = new JButton("Delete the file");
+		closeButton = new JButton("Close");
 
 		confirmButtonBuyer.addActionListener(this);
 		windowPanelBuyer.add(confirmButtonBuyer);
@@ -281,30 +313,17 @@ public class WindowApp extends JFrame implements ActionListener {
 		windowPanelBuyer.add(clearButtonBuyer);
 		clearButtonBuyer.setEnabled(false);
 
-		deleteButton.addActionListener(this);
-		windowPanelBuyer.add(deleteButton);
+		// deleteButton.addActionListener(this);
+		// windowPanelBuyer.add(deleteButton);
+		// deleteButton.setEnabled(false);
+		closeButton.addActionListener(this);
+		closeButton.setEnabled(false);
+		windowPanelBuyer.add(closeButton);
 
 		windowPanelBuyer.setVisible(true);
 		windowPanelSeller.setVisible(true);
 
 		Dimension maxSize;
-
-		// windowPanelTax.setMaximumSize(new Dimension(widthWindowMain, 30));
-		// windowPanelSeller.setMaximumSize(new Dimension(widthWindowMain, 570));
-		// windowPanelBuyer.setMaximumSize(new Dimension(widthWindowMain, 360));
-
-		// JPanel newPanel = new JPanel(new GridLayout(3, 1,0, 0));
-
-		// newPanel.add(windowPanelTax);
-		// newPanel.add(windowPanelSeller);
-		// newPanel.add(windowPanelBuyer);
-		// windowFrame.add(newPanel);
-		// windowPanelSeller.setSize(widthWindowMain, 570);
-		// windowPanelBuyer.setSize(widthWindowMain, 360);
-//		windowFrame.add(windowPanelTax);
-		// windowFrame.add(windowPanelSeller);
-		// windowFrame.add(windowPanelBuyer);
-
 		windowSplit = new JSplitPane();
 		windowSplit.setPreferredSize(windowFrame.getSize());
 		windowSplit.setDividerSize(0);
@@ -315,7 +334,7 @@ public class WindowApp extends JFrame implements ActionListener {
 		windowSplit.setVisible(true);
 
 		windowFrame.add(windowSplit);
-
+		setButtonsOff();
 		repaintFrame(windowFrame);
 
 	}
@@ -342,12 +361,12 @@ public class WindowApp extends JFrame implements ActionListener {
 
 			try {
 				// TODO TO OPTIMIZE!!!!!!!!!!!!!
-				System.out.println(
-						"pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && !conditionFlag_1 && !conditionFlag_2 "
-								+ pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) + conditionFlag_1
-								+ conditionFlag_2);
+//				System.out.println(
+//						"pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && !conditionFlag_1 && !conditionFlag_2 "
+//								+ pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) + conditionFlag_1
+//								+ conditionFlag_2);
 				if (pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && !conditionFlag_1 && !conditionFlag_2) {
-					theMiracleOfCreation(pdfObject, windowPanelSeller, 1, 5, 750, 530, 30, false, changeData);
+					theMiracleOfCreation(pdfObject, windowPanelSeller, 1, 5, 700, 530, 30, false, changeData);
 					message = "Confirmed. Successfully wrote to the file.";
 					conditionFlag_1 = true;
 					conditionFlag_2 = false;
@@ -356,15 +375,15 @@ public class WindowApp extends JFrame implements ActionListener {
 
 				} else {
 
-					if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && ((!conditionFlag_1
-							&& conditionFlag_2) || conditionFlag_3 )) {
-						theMiracleOfCreation(pdfObject, windowPanelSeller, 1, 5, 750, 530, 30, false, changeData);
+					if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData)
+							&& ((!conditionFlag_1 && conditionFlag_2) || conditionFlag_3)) {
+						theMiracleOfCreation(pdfObject, windowPanelSeller, 1, 5, 700, 530, 30, false, changeData);
 						message = "Append data to the file.";
 						confirmButtonSeller.setEnabled(false);
 						clearButtonSeller.setEnabled(false);
 						conditionFlag_1 = true;
 						conditionFlag_2 = false;
-						conditionFlag_3 =false;
+						conditionFlag_3 = false;
 					} else {
 						if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData)) {
 							message = "Old file already exists. Cannot overwrite.";
@@ -394,26 +413,26 @@ public class WindowApp extends JFrame implements ActionListener {
 		case "Confirm Data of Buyer":
 			try {
 
-				if (pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && !conditionFlag_1 && !conditionFlag_2 ) {
+				if (pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && !conditionFlag_1 && !conditionFlag_2) {
 					message = "Confirmed. Successfully wrote to the file.";
 
-					theMiracleOfCreation(pdfObject, windowPanelBuyer, 2, 350, 750, 0, 0, false, changeData);
+					theMiracleOfCreation(pdfObject, windowPanelBuyer, 2, 350, 700, 0, 0, false, changeData);
 
 					conditionFlag_1 = false;
 					conditionFlag_2 = true;
 					confirmButtonBuyer.setEnabled(false);
 					clearButtonBuyer.setEnabled(false);
 				} else {
-					if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData) && ((conditionFlag_1
-							&& !conditionFlag_2) || conditionFlag_3)) {
+					if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData)
+							&& ((conditionFlag_1 && !conditionFlag_2) || conditionFlag_3)) {
 
-						theMiracleOfCreation(pdfObject, windowPanelBuyer, 2, 350, 750, 0, 0, false, changeData);
+						theMiracleOfCreation(pdfObject, windowPanelBuyer, 2, 350, 700, 0, 0, false, changeData);
 						message = "Append data to the file.";
 						confirmButtonBuyer.setEnabled(false);
 						clearButtonBuyer.setEnabled(false);
 						conditionFlag_1 = false;
 						conditionFlag_2 = true;
-						conditionFlag_3 =false;
+						conditionFlag_3 = false;
 					} else {
 						if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData)) {
 							message = "Old file already exists. Cannot overwrite.";
@@ -461,6 +480,8 @@ public class WindowApp extends JFrame implements ActionListener {
 			changeData = false;
 			iteratorChangeData = 0;
 			break;
+		case "Close":
+			windowFrame.dispose();
 		default:
 
 		}
@@ -530,7 +551,7 @@ public class WindowApp extends JFrame implements ActionListener {
 			case 0:
 				// System.out.println("OK - zamkniecie " + proceed);
 				windowFrame2.dispose();
-				new GUI.Service(0);
+				new GUI.Service(getVat());
 				break;
 			case 1:
 				// System.out.println("CHANGE DATA " + proceed);
@@ -589,7 +610,7 @@ public class WindowApp extends JFrame implements ActionListener {
 
 //			instanceof is a binary operator we use to test if an object is of a given type. The result of the operation is either true or false.
 //			It's also known as a type comparison operator because it compares the instance with the type.
-			if (c instanceof JTextField) {
+			if (c instanceof JTextField || c instanceof JComboBox) {
 
 //				((JTextField) c).getText();
 //				if (((JTextField) c).getText().equals("")) {
@@ -602,8 +623,15 @@ public class WindowApp extends JFrame implements ActionListener {
 				if (z % 2 != 0) {
 
 					// add to HASHMAP Object
-					clientInInfos.fillUpTheMap(clientObjectChoice(k, clientchoice).toString(),
-							((JTextField) c).getText());
+					if (c instanceof JTextField) {
+						clientInInfos.fillUpTheMap(clientObjectChoice(k, clientchoice).toString(),
+								((JTextField) c).getText());
+					}
+					if (c instanceof JComboBox) {
+						clientInInfos.fillUpTheMap(clientObjectChoice(k, clientchoice).toString(),
+								(((JComboBox<Object>) c).getItemAt(((JComboBox<Object>) c).getSelectedIndex())
+										.toString()));
+					}
 					k = k + 1;
 				}
 
@@ -649,7 +677,29 @@ public class WindowApp extends JFrame implements ActionListener {
 
 		for (int i = 0; i < new DataOfAll(clientchoice).findSize(); i++) {
 			windowPanel.add(new JLabel(clientObjectChoice(i, clientchoice)));
-			windowPanel.add(new JTextField(""));
+			// System.out.println("VAT "+VATValue);
+			if (clientchoice == 3) {
+				
+				String a = new JLabel(clientObjectChoice(i, clientchoice)).getText();	
+				
+
+				
+				
+				if (a == "07.VAT rate") {
+					//System.out.println("VAT check " + this.VATValue);
+					((JTextComponent) windowPanel.add(new JTextField(this.VATValue))).setEditable(false);
+				}else if (a == "08.Net value"|| a ==  "09.VAT amount"|| a ==  "10.Gross value" ) {
+				
+					((JTextComponent) windowPanel.add(new JTextField(""))).setEditable(false);
+				 
+			} else	{
+				windowPanel.add(new JTextField(""));
+			}
+			
+			} 
+			else {
+				windowPanel.add(new JTextField(""));
+			}
 
 		}
 	}
@@ -659,7 +709,7 @@ public class WindowApp extends JFrame implements ActionListener {
 	 */
 
 	JLabel createJLabel(JLabel infoLabel, JPanel windowPanel, String message) {
-		if (infoLabel != null) {
+			if (infoLabel != null) {
 
 			windowPanel.remove(infoLabel);
 		}
@@ -710,19 +760,12 @@ public class WindowApp extends JFrame implements ActionListener {
 	static void clearOnlyPanel(JPanel panelToClean, JLabel infoLabel, JButton BtnConfirm, JButton BtnClear,
 			boolean choice) {
 
-		// infoLabel.setText(" ");
-		// infoLabel =null;
-
 		// if the file already exists but the delete button was pressed first then skip
 		// instruction
 		// System.out.println(infoLabel.toString());
 		if (infoLabel != null) {
 
 			panelToClean.remove(infoLabel);
-		}
-
-		for (int i = 0; i <= 30; i++) {
-			// System.out.println(" ");
 		}
 
 		if (choice) {
@@ -785,11 +828,9 @@ public class WindowApp extends JFrame implements ActionListener {
 
 		if (infoLabel == null) {
 			infoLabel = createJLabel(infoLabel, windowPanel, message);
-			// System.out.println("Text " + infoLabel.getText());
-			// System.out.println(infoLabel.toString());
+
 		} else {
-			// System.out.println("Text " + infoLabel.getText());
-			// System.out.println(infoLabel.toString());
+
 			windowPanel.remove(infoLabel);
 			infoLabel = createJLabel(infoLabel, windowPanel, message);
 		}
@@ -828,6 +869,14 @@ public class WindowApp extends JFrame implements ActionListener {
 
 		}
 		return flaghelp;
+	}
+
+	/**
+	 * Getting Vat value
+	 */
+	protected String getVat() {
+		// System.out.println("getVAt" + VATValue);
+		return this.VATValue;
 	}
 
 }
