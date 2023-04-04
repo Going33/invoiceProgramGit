@@ -187,6 +187,7 @@ public class PDFCreator {
 							contentStream.showText(nettostring);
 							contentStream.newLineAtOffset(0, 20);
 							contentStream.newLineAtOffset(130, 0);
+							//
 						}
 
 						else if (set.getKey().equals("09.VAT amount")) {
