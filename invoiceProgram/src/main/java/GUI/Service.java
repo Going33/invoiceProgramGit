@@ -1,6 +1,7 @@
 package GUI;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -19,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import Client.DataOfAll;
 import Data.PDFCreator;
@@ -49,16 +51,15 @@ public class Service extends WindowApp implements ActionListener {
 	 * Inheritance applied but call "zero" constructor
 	 * 
 	 */
-//	private windowApp objectForStealMethos = new windowApp(0);
-//	DataOfAll serviceInfo = new DataOfAll(3);
 
 	public Service(String VATValue) {
 		super(VATValue);
-		//this.VATValue = VATValue;
-		//System.out.println("Service "+VATValue);
 		init();
 	}
 
+	/**
+	 * Init of the window
+	 */
 	@Override
 	public void init() {
 
@@ -71,8 +72,6 @@ public class Service extends WindowApp implements ActionListener {
 		windowFrame.pack();
 		windowFrame.setResizable(false);
 		windowFrame.setVisible(true);
-		// System.out.println(row + " " + coll);
-		// System.out.println(new DataOfAll(3).findSize());
 		windowPanel = new JPanel(new GridLayout(row, coll, 0, 0));
 		windowPanel.setBackground(Color.WHITE);
 		panelDisplay(windowPanel, 3);
@@ -83,15 +82,13 @@ public class Service extends WindowApp implements ActionListener {
 		clearButton = new JButton("Clear Data");
 		deleteButton = new JButton("Delete the file");
 		closeButton = new JButton("Close");
-		
-		
+
 		confirmButton.addActionListener(this);
 		windowPanel.add(confirmButton);
-		
+
 		closeButton.addActionListener(this);
 		windowPanel.add(closeButton);
-		
-		
+
 		clearButton.addActionListener(this);
 		windowPanel.add(clearButton);
 
@@ -101,15 +98,20 @@ public class Service extends WindowApp implements ActionListener {
 		confirmButton.setEnabled(true);
 		clearButton.setEnabled(true);
 		deleteButton.setEnabled(true);
-		
 
 	}
 
+	/**
+	 * @Override actionPerformed
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		doTheThings_actionPerformed(e);
 	}
 
+	/**
+	 * @Override doTheThings_actionPerformed
+	 */
 	@Override
 	public void doTheThings_actionPerformed(ActionEvent e) {
 		Object[] options = { "OK" };
@@ -118,66 +120,29 @@ public class Service extends WindowApp implements ActionListener {
 		case "Confirm Data":
 			// System.out.println(" ");
 
-			Path pdfPath = Paths.get(absPathPDF);
-
-			try {
-				pdfNewByteArray = Files.readAllBytes(pdfPath);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			// pdfNewByteArray = readAllBytesFromThePDF(absPathPDF, pdfNewByteArray);
 
 			infoLabel = confirmOrOverwrite(options, changeData, conditionFlag_1, pdfObject, windowPanel, infoLabel,
 					confirmButton, clearButton, deleteButton, windowFrame, message);
 
 			conditionFlag_1 = true;
 			confirmButton.setEnabled(false);
-//			confirmButton.setText("Close");
-//			if(confirmButton.getText() == "Close")
-//			{
-//				confirmButton.addActionListener((ActionEvent ev)->windowFrame.dispose());
-//			}
+
 			break;
 		case "Overwrite":
 
-			/**
-			 * It is not possible to overwrite a previously created pdf file in the "normal"
-			 * way. The old state of the pdf file is stored in a byte array, and then the
-			 * new data is appended. TODO optimization strongly required
-			 * 
-			 */
-			File pdfOld = new File(absPathPDF);
-			pdfOld.delete();
-			OutputStream out;
-			try {
-				out = new FileOutputStream(absPathPDF);
-				out.write(pdfNewByteArray);
-				out.close();
-
-			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-
-			// conditionFlag_1 = true;
-			// System.out.println("Tutaj Overwrite " +changeData);
+			// restoreSavedByteArrayAsAFile(absPathPDF, pdfNewByteArray);
 			infoLabel = confirmOrOverwrite(options, changeData, conditionFlag_1, pdfObject, windowPanel, infoLabel,
 					confirmButton, clearButton, deleteButton, windowFrame, message);
 			confirmButton.setEnabled(false);
 			// System.out.println("conditionFlag_1 " + proceedFlag_2);
 			break;
 		case "Clear Data":
-			// System.out.println(" ");
-			//////////
-			// does not work correctly yet
+
 			confirmButton.setText("Overwrite");
 			confirmButton.setEnabled(true);
 			changeData = false;
-			/////////
-			// System.out.println("Tutaj Clear Data " +changeData);
+
 			infoLabel = clearData(infoLabel, windowPanel, confirmButton, clearButton, true);
 			break;
 
@@ -194,18 +159,67 @@ public class Service extends WindowApp implements ActionListener {
 		}
 	}
 
+	/**
+	 * @Override clearData clearData must be overwritten so that the VAT rate
+	 *           information is not cleared
+	 */
+	@Override
+	protected JLabel clearData(JLabel infoLabel, JPanel windowPanel, JButton confirmButton, JButton clearButton,
+			boolean b) {
+
+		boolean tempBoolean = false;
+
+		if (!checkStatusOfLabel(infoLabel, windowPanel)) {
+
+			windowPanel.remove(infoLabel);
+
+			for (Component c : windowPanel.getComponents()) {
+
+				if (c instanceof JLabel) {
+					if (((JLabel) c).getText().toString() == "07.VAT rate") {
+						tempBoolean = false;
+					} else {
+						tempBoolean = true;
+					}
+
+				}
+
+				if (c instanceof JTextField && tempBoolean) {
+					((JTextField) c).setText("");
+				}
+
+			}
+
+		}
+		infoLabel = createJLabel(infoLabel, windowPanel, "Cleared");
+		confirmButton.setEnabled(true);
+		clearButton.setEnabled(false);
+		return infoLabel;
+
+	}
+
+	/**
+	 * Confirm or overwrite
+	 */
 	protected JLabel confirmOrOverwrite(Object[] options, boolean changeData, boolean conditionFlag_1,
 			PDFCreator pdfObject, JPanel windowPanel, JLabel infoLabel, JButton confirmButton, JButton clearButton,
 			JButton deleteButton, JFrame windowFrame, String message) {
+
+		if (!conditionFlag_1) {
+			pdfNewByteArray = readAllBytesFromThePDF(absPathPDF, pdfNewByteArray);
+		} else {
+			restoreSavedByteArrayAsAFile(absPathPDF, pdfNewByteArray);
+		}
+
 		try {
 
-			// TODO TO OPTIMIZE!!!!!!!!!!!!!
+			if (pdfObject.checkIfAFIleIsAlreadyExistingPDF()) {
 
-			if (pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData)) {
+				message = errorEncounteredNoneEmptyField(
+						theMiracleOfCreation(pdfObject, windowPanel, 3, 5, 500, 0, 0, true, changeData));
+				confirmButton.setEnabled(true);
+				clearButton.setEnabled(true);
 				conditionFlag_1 = true;
-				confirmButton.setEnabled(false);
-				clearButton.setEnabled(false);
-				deleteButton.setEnabled(true);
 
 				/**
 				 * Lambda expression
@@ -220,13 +234,11 @@ public class Service extends WindowApp implements ActionListener {
 
 			} else {
 
-				if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF(changeData)) {
-					// pos x,pos y pos_x offset, pos_y offset
-					theMiracleOfCreation(pdfObject, windowPanel, 3, 5, 500, 0, 0, true, changeData);
-					message = "Append data to the file.";
-					confirmButton.setEnabled(true);
-					clearButton.setEnabled(true);
-					conditionFlag_1 = true;
+				if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF()) {
+					conditionFlag_1 = false;
+					confirmButton.setEnabled(false);
+					clearButton.setEnabled(false);
+					deleteButton.setEnabled(true);
 
 				} else {
 					setButtonsOff();
@@ -244,13 +256,9 @@ public class Service extends WindowApp implements ActionListener {
 		}
 
 		if (!checkStatusOfLabel(infoLabel, windowPanel)) {
-
-			// delete existing "delete" JLabel
 			windowPanel.remove(infoLabel);
-
 		}
 		return infoLabel = createJLabel(infoLabel, windowPanel, message);
 	}
 
-	
 }

@@ -8,19 +8,20 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Map;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import Client.DataOfAll;
-import GUI.WindowApp;
 
 public class PDFCreator {
 
 	final private String absPathPDF = System.getProperty("user.dir") + "\\Invoice_" + LocalDate.now() + ".pdf";
 
 	final private File myObjPDF = new File(absPathPDF);
-	private WindowApp helpObject;
 	private boolean flagDelete;
 	private boolean flagCheck;
 	private String grossValue = "";
@@ -31,11 +32,15 @@ public class PDFCreator {
 	Float netto;
 	String nettostring = "";
 	private int fontSizeValue = 12;
+	Boolean emptyFieldState;
+	Boolean resultOfaddPaymentInformation;
 
 	/**
 	 * Create pdf file, otherwise overwrite.
+	 * 
+	 * @return
 	 */
-	public void makeAFile(Map<String, String> allDataMap, int x_pos, int y_pos, int x_Offset, int y_Offset,
+	public Boolean makeAFile(Map<String, String> allDataMap, int x_pos, int y_pos, int x_Offset, int y_Offset,
 			boolean addMoney, boolean changeData) {
 		// System.out.println("makeAFile funkcja " + changeData);
 		try {
@@ -49,7 +54,7 @@ public class PDFCreator {
 
 				document.addPage(new PDPage());
 
-				addPaymentInformation(allDataMap, document, document.getPage(0),
+				resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
 						new PDPageContentStream(document, document.getPage(0)), x_pos, y_pos, x_Offset, y_Offset, true,
 						addMoney, changeData);
 
@@ -68,12 +73,12 @@ public class PDFCreator {
 				PDDocument document = PDDocument.load(myObjPDF);
 
 				if (changeData) {
-					addPaymentInformation(allDataMap, document, document.getPage(0),
+					resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
 							new PDPageContentStream(document, document.getPage(0),
 									PDPageContentStream.AppendMode.OVERWRITE, true),
 							x_pos, y_pos, x_Offset, y_Offset, false, addMoney, changeData);
 				} else {
-					addPaymentInformation(allDataMap, document, document.getPage(0),
+					resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
 							new PDPageContentStream(document, document.getPage(0),
 									PDPageContentStream.AppendMode.APPEND, true),
 							x_pos, y_pos, x_Offset, y_Offset, false, addMoney, changeData);
@@ -91,14 +96,20 @@ public class PDFCreator {
 
 			e.printStackTrace();
 		}
+
+		// System.out.println("resultOfaddPaymentInformation: " +
+		// resultOfaddPaymentInformation);
+		return resultOfaddPaymentInformation;
 	}
 
 	/**
 	 * 3 scenarios are possible. If there is no client - add infos abt him, if
 	 * seller/buyer is already added, add the next one, if both clients are added
 	 * then add gross.
+	 * 
+	 * @return
 	 */
-	public void addPaymentInformation(Object object, PDDocument document, PDPage page,
+	public Boolean addPaymentInformation(Object object, PDDocument document, PDPage page,
 			PDPageContentStream contentStream, int tX, int tY, int x_Offset, int y_Offset, boolean firstWrite,
 			boolean addMoney, boolean changeData) throws IOException {
 		int i = 0;
@@ -138,6 +149,21 @@ public class PDFCreator {
 
 				for (Map.Entry<String, String> set : ((Map<String, String>) object).entrySet()) {
 
+					if (set.getKey() == "08.Net value" || set.getKey() == "09.VAT amount"
+							|| set.getKey() == "10.Gross value") {
+						emptyFieldState = true;
+					} else {
+
+						if (!isEmpty(set.getValue().toString(), set.getKey().toString())) {
+							emptyFieldState = false;
+							break;
+						} else {
+
+							emptyFieldState = true;
+
+						}
+					}
+
 					if (i < j / 2) {
 						contentStream.showText(set.getKey().toString());
 						contentStream.newLineAtOffset(0, -20);
@@ -147,7 +173,15 @@ public class PDFCreator {
 						i = i + 1;
 
 						if (set.getKey() == ("04.Qty")) {
-							Qty = set.getValue();
+
+							if (!isNumeric(set.getValue())) {
+								// Qty = set.getValue();
+								break;
+
+							} else {
+								Qty = set.getValue();
+							}
+
 						}
 
 						if (i == j / 2) {
@@ -161,12 +195,17 @@ public class PDFCreator {
 					else {
 
 						if (set.getKey() == ("06.Unit price")) {
-							unitPrice = set.getValue();
-							contentStream.showText(set.getKey().toString());
-							contentStream.newLineAtOffset(0, -20);
-							contentStream.showText(set.getValue().toString());
-							contentStream.newLineAtOffset(0, 20);
-							contentStream.newLineAtOffset(130, 0);
+
+							if (isNumeric(set.getValue())) {
+								unitPrice = set.getValue();
+								contentStream.showText(set.getKey().toString());
+								contentStream.newLineAtOffset(0, -20);
+								contentStream.showText(set.getValue().toString());
+								contentStream.newLineAtOffset(0, 20);
+								contentStream.newLineAtOffset(130, 0);
+							} else {
+								break;
+							}
 
 						} else if (set.getKey() == ("07.VAT rate")) {
 							VATRate = set.getValue();
@@ -178,6 +217,7 @@ public class PDFCreator {
 						}
 
 						else if (set.getKey() == ("08.Net value")) {
+							System.out.println("unitPrice " + unitPrice + " Qty " + Qty);
 							netto = Float.parseFloat(unitPrice) * Float.parseFloat(Qty);
 							nettostring = Double.toString(netto);
 							System.out.println("Netto :" + nettostring);
@@ -192,8 +232,14 @@ public class PDFCreator {
 
 						else if (set.getKey().equals("09.VAT amount")) {
 							Float temp;
-							temp = Float.parseFloat(grossValue) - netto;
-							VATAmount = temp.toString();
+							try {
+								temp = Float.parseFloat(grossValue) - netto;
+								VATAmount = temp.toString();
+							} catch (NumberFormatException e) {
+								VATAmount = grossValue.toString();
+								grossValue = netto.toString();
+							}
+
 							System.out.println("VATAmount " + VATAmount);
 							contentStream.showText(set.getKey().toString());
 							contentStream.newLineAtOffset(0, -20);
@@ -227,6 +273,16 @@ public class PDFCreator {
 				 * Second write.
 				 */
 				for (Map.Entry<String, String> set : ((Map<String, String>) object).entrySet()) {
+
+					if (!isEmpty(set.getValue().toString(), set.getKey().toString())) {
+						emptyFieldState = false;
+						break;
+					} else {
+
+						emptyFieldState = true;
+
+					}
+
 					contentStream.showText(set.getKey().toString() + " " + set.getValue().toString());
 					contentStream.newLineAtOffset(0, -20);
 				}
@@ -239,6 +295,46 @@ public class PDFCreator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return emptyFieldState;
+	}
+
+	/**
+	 * Check if the field is a numeric value.
+	 */
+	private Boolean isNumeric(String userInput) {
+		Boolean result;
+
+		try {
+
+			Float.parseFloat(userInput);
+			// localVariable = check.toString();
+			result = true;
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(new JFrame(), "Error! Number Format Exception! " + userInput, "Error",
+					JOptionPane.ERROR_MESSAGE);
+			result = false;
+		}
+		return result;
+	}
+
+	/**
+	 * Check if the field is empty.
+	 */
+	private Boolean isEmpty(String userInput, String fieldName) {
+		Boolean result;
+
+		if (userInput == null || userInput.length() == 0)
+
+		{
+			result = false;
+			JOptionPane.showMessageDialog(new JFrame(), "Error! Empty field! " + fieldName, "Error",
+					JOptionPane.ERROR_MESSAGE);
+
+		} else {
+			result = true;
+		}
+		return result;
+
 	}
 
 	/**
@@ -258,11 +354,11 @@ public class PDFCreator {
 	/**
 	 * Set the flag to true if the file exists.
 	 */
-	public boolean checkIfAFIleIsAlreadyExistingPDF(boolean changeData) {
-		if (myObjPDF.exists() && changeData == false) {
-			flagCheck = false;
-		} else {
+	public boolean checkIfAFIleIsAlreadyExistingPDF() {
+		if (myObjPDF.exists()) {
 			flagCheck = true;
+		} else {
+			flagCheck = false;
 		}
 		return flagCheck;
 	}
@@ -278,12 +374,15 @@ public class PDFCreator {
 		switch (VAxTValue2) {
 		case "oo.":
 			result = "Reverse charge";
+
 			break;
 		case "np.":
 			result = "Not subject to VAT";
+
 			break;
 		case "zw.":
 			result = "VAT exemption";
+
 			break;
 		case "0%":
 			resultFloat = Float.parseFloat(value) * 1;
