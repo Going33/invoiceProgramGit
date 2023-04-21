@@ -1,10 +1,5 @@
 package GUI;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -33,8 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
-
-import org.junit.jupiter.api.Test;
 
 import Client.Client;
 import Client.DataOfAll;
@@ -77,7 +70,8 @@ public class WindowApp extends JFrame implements ActionListener {
 	 */
 	private static boolean proceedFlag_2 = false;
 
-	private String VATValue = "";
+	public String taxValue = "";
+	public static String currValue = "";
 	/**
 	 * Path of the file.
 	 */
@@ -106,8 +100,9 @@ public class WindowApp extends JFrame implements ActionListener {
 	 * possible to call the constructor which does nothing and override the methods
 	 * without any issues.
 	 */
-	public WindowApp(String VATValue) {
-		this.VATValue = VATValue;
+	public WindowApp(String taxValue, String currValue) {
+		this.taxValue = taxValue;
+		this.currValue = currValue;
 	}
 
 	/**
@@ -127,13 +122,18 @@ public class WindowApp extends JFrame implements ActionListener {
 			private JButton confirmTax;
 			private JButton deleteTax;
 			private JButton closeTax;
-			private int rowTax = 8;
+			private int rowTax = 10;
 			private int collTax = 1;
-			private String taxValue = "";
+			private String[] userChoice = new String[2];
+			private boolean notPressedC = false;
+			private boolean notPressedD = false;
 			JPanel windowPanelTax;
 			JFrame windowFrameLocal;
-			String list[] = { "oo.", "np.", "zw.", "0%", "5%", "7%", "8%", "23%" };
-			JComboBox<Object> taxList = new JComboBox<Object>(list);
+			private final String listVAT[] = { "oo.", "np.", "zw.", "0%", "5%", "7%", "8%", "23%" };
+			private final JComboBox<Object> vList = new JComboBox<Object>(listVAT);
+
+			private final String listCurrency[] = { "EUR", "USD", "PLN" };
+			private final JComboBox<Object> cList = new JComboBox<Object>(listCurrency);
 
 			private TaxChoice() {
 				initTaxChoice();
@@ -157,8 +157,20 @@ public class WindowApp extends JFrame implements ActionListener {
 				confirmTax = new JButton("Confirm");
 				deleteTax = new JButton("Delete File");
 				closeTax = new JButton("Close");
-				taxValue = VATListPanel(windowPanelTax, 4);
 
+				
+				if(pdfObject.checkIfAFIleIsAlreadyExistingPDF())
+				{
+					deleteTax.setEnabled(true);
+				}else {
+					deleteTax.setEnabled(false);
+				}
+				
+				VATListPanel(windowPanelTax, 4, vList, cList);
+				// taxValue = userChoice[0];
+				System.out.println(taxValue);
+				// currValue = userChoice[1];
+				System.out.println(currValue);
 				repaintFrame(windowFrameLocal);
 
 				confirmTax.addActionListener(new ActionListener() {
@@ -187,7 +199,7 @@ public class WindowApp extends JFrame implements ActionListener {
 							message = "Error.Cannot create the file";
 							e.printStackTrace();
 						}
-
+						notPressedC = true;
 						// JLabel infoLabelTax = null;
 						ifcheckStatusOfLabel(infoLabelTax, windowPanelTax);
 						infoLabelTax = createJLabel(infoLabelTax, windowPanelTax, message);
@@ -199,14 +211,11 @@ public class WindowApp extends JFrame implements ActionListener {
 					public void actionPerformed(ActionEvent evt) {
 
 						try {
-
 							if (pdfObject.checkIfAFIleIsAlreadyExistingPDF()) {
 								message = deleteFlagGUI(new PDFCreator(), false);
 								infoLabelTax = deleteTheFile(infoLabelTax, windowPanelTax, clearButtonBottom,
 										clearButtonBottom, message);
 								setButtonsOff();
-							} else {
-								message = "Unable to delete the file!";
 							}
 
 						} catch (Exception e) {
@@ -214,6 +223,7 @@ public class WindowApp extends JFrame implements ActionListener {
 							message = "Error. Cannot delete the file";
 							e.printStackTrace();
 						}
+						notPressedD = true;
 						confirmTax.setEnabled(true);
 						deleteTax.setEnabled(false);
 						ifcheckStatusOfLabel(infoLabelTax, windowPanelTax);
@@ -221,13 +231,23 @@ public class WindowApp extends JFrame implements ActionListener {
 					}
 				});
 
+				/**
+				 * Press close button to close the Tax Window.
+				 * If the Confirm button is not pressed, then close both windows.
+				 */
+
 				closeTax.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						setButtonsOn();
 
 						closeButton.setEnabled(true);
-						windowFrameLocal.dispose();
 
+						if (notPressedC == true) {
+							windowFrameLocal.dispose();
+						} else {
+							windowFrameLocal.dispose();
+							windowFrame.dispose();
+						}
 					}
 				});
 
@@ -241,25 +261,30 @@ public class WindowApp extends JFrame implements ActionListener {
 			 * VATListPanel - 4th from DataOfAll
 			 */
 
-			private String VATListPanel(JPanel windowPanel, int k) {
+			private void VATListPanel(JPanel windowPanel, int k, JComboBox<Object> specificList,
+					JComboBox<Object> specificList2) {
 
 				for (int i = 0; i < new DataOfAll(k).findSize(); i++) {
 					windowPanel.add(new JLabel(clientObjectChoice(i, 4)));
 					if (i == 0) {
-						// windowPanel.add(new JTextField(" "));
-
-						windowPanel.add(taxList);
+						windowPanel.add(specificList);
 						confirmTax.addActionListener(new ActionListener() {
+
 							public void actionPerformed(ActionEvent e) {
-								taxValue = taxList.getItemAt(taxList.getSelectedIndex()).toString();
-								VATValue = taxValue;
 
-								// ifcheckStatusOfLabel(infoLabelTax, windowPanel);
-								// infoLabelTax = createJLabel(infoLabelTax, windowPanel, message);
-
+								taxValue = specificList.getItemAt(specificList.getSelectedIndex()).toString();
 							}
 						});
 
+					} else if (i == 2) {
+						windowPanel.add(specificList2);
+						confirmTax.addActionListener(new ActionListener() {
+
+							public void actionPerformed(ActionEvent e) {
+
+								currValue = specificList2.getItemAt(specificList2.getSelectedIndex()).toString();
+							}
+						});
 					} else {
 						LocalDate today = LocalDate.now();
 						DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -268,8 +293,6 @@ public class WindowApp extends JFrame implements ActionListener {
 					}
 
 				}
-
-				return taxValue;
 			}
 
 		}
@@ -368,7 +391,7 @@ public class WindowApp extends JFrame implements ActionListener {
 		case "Confirm Data of Seller":
 
 			try {
-				message = confrimDataMethod(pdfObject, message, windowPanelTop, 1, 5, 700, 530, 30, false,
+				message = confrimDataMethod(pdfObject, message, windowPanelTop, 1, 25, 650, 530, 30, false,
 						confirmButtonTop, clearButtonTop);
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -385,7 +408,7 @@ public class WindowApp extends JFrame implements ActionListener {
 		case "Confirm Data of Buyer":
 			try {
 
-				message = confrimDataMethod(pdfObject, message, windowPanelBottom, 2, 350, 700, 0, 0, false,
+				message = confrimDataMethod(pdfObject, message, windowPanelBottom, 2, 370, 650, 0, 0, false,
 						confirmButtonBottom, clearButtonBottom);
 
 			} catch (Exception e1) {
@@ -404,13 +427,13 @@ public class WindowApp extends JFrame implements ActionListener {
 
 		case "Clear Data of Seller":
 
-			infoLabelTop = clearData(infoLabelTop, windowPanelTop, confirmButtonTop, clearButtonTop,
-					true,windowFrame);
+			infoLabelTop = clearData(infoLabelTop, windowPanelTop, confirmButtonTop, clearButtonTop, true, windowFrame);
 			break;
 
 		case "Clear Data of Buyer":
 
-			infoLabelBottom = clearData(infoLabelBottom, windowPanelBottom, confirmButtonBottom, clearButtonBottom, true,windowFrame);
+			infoLabelBottom = clearData(infoLabelBottom, windowPanelBottom, confirmButtonBottom, clearButtonBottom,
+					true, windowFrame);
 			break;
 		case "Close":
 			windowFrame.dispose();
@@ -481,7 +504,7 @@ public class WindowApp extends JFrame implements ActionListener {
 			switch (proceed) {
 			case 0:
 				windowFrame2.dispose();
-				new GUI.Service(getVat());
+				new GUI.Service(getVat(),getCurr());
 				break;
 			case 1:
 				restoreSavedByteArrayAsAFile(absPathPDF, pdfNewByteArray);
@@ -641,7 +664,7 @@ public class WindowApp extends JFrame implements ActionListener {
 
 				if (a.equals("07.VAT rate")) {
 					// //System.out.println("VAT check " + this.VATValue);
-					((JTextComponent) windowPanel.add(new JTextField(this.VATValue))).setEditable(false);
+					((JTextComponent) windowPanel.add(new JTextField(this.taxValue))).setEditable(false);
 				} else if (a.equals("08.Net value") || a.equals("09.VAT amount") || a.equals("10.Gross value")) {
 					((JTextComponent) windowPanel.add(new JTextField(""))).setEditable(false);
 
@@ -691,9 +714,9 @@ public class WindowApp extends JFrame implements ActionListener {
 		if (!checkStatusOfLabel(infoLabel, windowPanel)) {
 
 			windowPanel.remove(infoLabel);
-			clearOnlyPanel(windowPanel, infoLabel, confirmButton, clearButton, b,windowFrame);
+			clearOnlyPanel(windowPanel, infoLabel, confirmButton, clearButton, b, windowFrame);
 		} else {
-			clearOnlyPanel(windowPanel, infoLabel, confirmButton, clearButton, b,windowFrame);
+			clearOnlyPanel(windowPanel, infoLabel, confirmButton, clearButton, b, windowFrame);
 		}
 		infoLabel = createJLabel(infoLabel, windowPanel, "Cleared");
 		confirmButton.setEnabled(true);
@@ -732,8 +755,8 @@ public class WindowApp extends JFrame implements ActionListener {
 	 */
 	static void clearEverything() {
 
-		clearOnlyPanel(windowPanelTop, infoLabelTop, confirmButtonTop, clearButtonTop, false,windowFrame);
-		clearOnlyPanel(windowPanelBottom, infoLabelBottom, confirmButtonBottom, clearButtonBottom, false,windowFrame);
+		clearOnlyPanel(windowPanelTop, infoLabelTop, confirmButtonTop, clearButtonTop, false, windowFrame);
+		clearOnlyPanel(windowPanelBottom, infoLabelBottom, confirmButtonBottom, clearButtonBottom, false, windowFrame);
 
 		setFlagsFalse();
 		setButtonsOn();
@@ -807,11 +830,17 @@ public class WindowApp extends JFrame implements ActionListener {
 	/**
 	 * Getting Vat value
 	 */
-	protected String getVat() {
+	public String getVat() {
 		// //System.out.println("getVAt" + VATValue);
-		return this.VATValue;
+		return taxValue;
 	}
-
+	/**
+	 * Getting currency choice
+	 */
+	public String getCurr() {
+		System.out.println("currValue " + currValue);
+		return currValue;
+	}
 	/**
 	 * Set a specific message depending on whether the file has been deleted or not
 	 *
@@ -843,7 +872,4 @@ public class WindowApp extends JFrame implements ActionListener {
 		return message;
 	}
 
-	
-
-	
 }

@@ -16,6 +16,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import Client.DataOfAll;
+import GUI.WindowApp;
 
 public class PDFCreator {
 
@@ -34,7 +35,7 @@ public class PDFCreator {
 	final private int fontSizeValue = 12;
 	Boolean emptyFieldState;
 	Boolean resultOfaddPaymentInformation;
-
+	
 	/**
 	 * Create pdf file, otherwise overwrite.
 	 * 
@@ -203,6 +204,9 @@ public class PDFCreator {
 						}
 
 						else if (set.getKey() == ("08.Net value")) {
+							
+							//String curr =WindowApp.currValue;
+							//System.out.println("WindowApp.currValue : "+curr);
 							System.out.println("unitPrice " + unitPrice + " Qty " + Qty);
 							netto = Float.parseFloat(unitPrice) * Float.parseFloat(Qty);
 							nettostring = Double.toString(netto);
@@ -210,7 +214,8 @@ public class PDFCreator {
 							grossValue = countBrutto(nettostring, VATRate);
 							contentStream.showText(set.getKey().toString());
 							contentStream.newLineAtOffset(0, -20);
-							contentStream.showText(nettostring);
+							//curr = nettostring.toString() + curr;
+							contentStream.showText(nettostring+" "+WindowApp.currValue);
 							contentStream.newLineAtOffset(0, 20);
 							contentStream.newLineAtOffset(130, 0);
 							//
@@ -229,7 +234,7 @@ public class PDFCreator {
 							System.out.println("VATAmount " + VATAmount);
 							contentStream.showText(set.getKey().toString());
 							contentStream.newLineAtOffset(0, -20);
-							contentStream.showText(VATAmount);
+							contentStream.showText(VATAmount+" "+WindowApp.currValue);
 							contentStream.newLineAtOffset(0, 20);
 							contentStream.newLineAtOffset(130, 0);
 
@@ -238,7 +243,7 @@ public class PDFCreator {
 						else if (set.getKey().equals("10.Gross value")) {
 							contentStream.showText(set.getKey().toString());
 							contentStream.newLineAtOffset(0, -20);
-							contentStream.showText(grossValue);
+							contentStream.showText(grossValue+" "+WindowApp.currValue);
 							contentStream.newLineAtOffset(0, 20);
 							contentStream.newLineAtOffset(130, 0);
 

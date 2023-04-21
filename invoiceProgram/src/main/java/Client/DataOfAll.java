@@ -44,6 +44,7 @@ public class DataOfAll implements InvoiceMethodsInterface {
 		case 4:
 			infoList.add("VAT %");
 			infoList.add("No: ");
+			infoList.add("Currency: ");
 			break;
 		default:
 			break;

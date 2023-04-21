@@ -43,8 +43,8 @@ public class Service extends WindowApp implements ActionListener {
 	 * 
 	 */
 
-	public Service(String VATValue) {
-		super(VATValue);
+	public Service(String taxValue, String currValue) {
+		super(taxValue, currValue);
 		init();
 	}
 
@@ -205,7 +205,7 @@ public class Service extends WindowApp implements ActionListener {
 
 				
 				message = 
-						theMiracleOfCreation(pdfObject, windowPanel, 3, 5, 500, 0, 0, true);
+						theMiracleOfCreation(pdfObject, windowPanel, 3, 5, 450, 0, 0, true);
 				confirmButton.setEnabled(true);
 				clearButton.setEnabled(true);
 				conditionFlag_1 = true;
