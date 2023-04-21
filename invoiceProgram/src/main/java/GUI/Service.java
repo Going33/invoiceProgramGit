@@ -6,14 +6,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 
 import javax.swing.JButton;
@@ -22,7 +14,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import Client.Client;
 import Client.DataOfAll;
 import Data.PDFCreator;
 
@@ -138,13 +129,13 @@ public class Service extends WindowApp implements ActionListener {
 
 			confirmButton.setText("Overwrite");
 			confirmButton.setEnabled(true);
-			infoLabel = clearData(infoLabel, windowPanel, confirmButton, clearButton, true);
+			infoLabel = clearData(infoLabel, windowPanel, confirmButton, clearButton, true,windowFrame);
 			break;
 
 		case "Delete the file":
 			// System.out.println(" tutaj Delete the file");
 			message = deleteFlagGUI(new PDFCreator(), false);
-			infoLabel = deleteTheFile(infoLabel, windowPanel, clearButton, clearButton, message);
+			infoLabel = deleteTheFile(infoLabel, windowPanel, clearButton, clearButton,message);
 			confirmButton.setEnabled(false);
 			clearButton.setEnabled(false);
 			break;
@@ -157,12 +148,12 @@ public class Service extends WindowApp implements ActionListener {
 	}
 
 	/**
-	 * @Override clearData clearData must be overwritten so that the VAT rate
+	 *clearData clearData must be overwritten so that the VAT rate
 	 *           information is not cleared
 	 */
-	@Override
+	 @Override 
 	protected JLabel clearData(JLabel infoLabel, JPanel windowPanel, JButton confirmButton, JButton clearButton,
-			boolean b) {
+			boolean b,JFrame windowFrame) {
 
 		boolean tempBoolean = false;
 
@@ -213,8 +204,8 @@ public class Service extends WindowApp implements ActionListener {
 			if (pdfObject.checkIfAFIleIsAlreadyExistingPDF()) {
 
 				
-				message = errorEncounteredNoneEmptyField(
-						theMiracleOfCreation(pdfObject, windowPanel, 3, 5, 500, 0, 0, true));
+				message = 
+						theMiracleOfCreation(pdfObject, windowPanel, 3, 5, 500, 0, 0, true);
 				confirmButton.setEnabled(true);
 				clearButton.setEnabled(true);
 				conditionFlag_1 = true;

@@ -31,7 +31,7 @@ public class PDFCreator {
 	String VATAmount = "";
 	Float netto;
 	String nettostring = "";
-	private int fontSizeValue = 12;
+	final private int fontSizeValue = 12;
 	Boolean emptyFieldState;
 	Boolean resultOfaddPaymentInformation;
 
@@ -76,33 +76,14 @@ public class PDFCreator {
 								PDPageContentStream.AppendMode.APPEND, true),
 						x_pos, y_pos, x_Offset, y_Offset, false, addMoney);
 			
-//				if (changeData) {
-//					resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
-//							new PDPageContentStream(document, document.getPage(0),
-//									PDPageContentStream.AppendMode.OVERWRITE, true),
-//							x_pos, y_pos, x_Offset, y_Offset, false, addMoney);
-//				} else {
-//					resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
-//							new PDPageContentStream(document, document.getPage(0),
-//									PDPageContentStream.AppendMode.APPEND, true),
-//							x_pos, y_pos, x_Offset, y_Offset, false, addMoney);
-//
-//				}
 
 				document.close();
-				// System.out.println(" else myObjPDF.createNewFile()
-				// writeToByte(firstArray,allDataMap)");
-
 			}
 
-			// }
 		} catch (IOException e) {
 
 			e.printStackTrace();
 		}
-
-		// System.out.println("resultOfaddPaymentInformation: " +
-		// resultOfaddPaymentInformation);
 		return resultOfaddPaymentInformation;
 	}
 
@@ -113,6 +94,7 @@ public class PDFCreator {
 	 * 
 	 * @return
 	 */
+	
 	public Boolean addPaymentInformation(Object object, PDDocument document, PDPage page,
 			PDPageContentStream contentStream, int tX, int tY, int x_Offset, int y_Offset, boolean firstWrite,
 			boolean addMoney) throws IOException {
