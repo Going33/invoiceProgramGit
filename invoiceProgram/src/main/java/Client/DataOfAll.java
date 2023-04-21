@@ -3,8 +3,7 @@ package Client;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataOfAll implements SomeInvoiceMethods_DefinitelyItNeedsBetterNameInterface {
-
+public class DataOfAll implements InvoiceMethodsInterface {
 	private final List<String> infoList = new ArrayList<String>();
 
 	/**

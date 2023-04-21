@@ -41,7 +41,7 @@ public class PDFCreator {
 	 * @return
 	 */
 	public Boolean makeAFile(Map<String, String> allDataMap, int x_pos, int y_pos, int x_Offset, int y_Offset,
-			boolean addMoney, boolean changeData) {
+			boolean addMoney) {
 		// System.out.println("makeAFile funkcja " + changeData);
 		try {
 
@@ -56,7 +56,7 @@ public class PDFCreator {
 
 				resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
 						new PDPageContentStream(document, document.getPage(0)), x_pos, y_pos, x_Offset, y_Offset, true,
-						addMoney, changeData);
+						addMoney);
 
 				document.close();
 
@@ -71,19 +71,23 @@ public class PDFCreator {
 
 			} else {
 				PDDocument document = PDDocument.load(myObjPDF);
-
-				if (changeData) {
-					resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
-							new PDPageContentStream(document, document.getPage(0),
-									PDPageContentStream.AppendMode.OVERWRITE, true),
-							x_pos, y_pos, x_Offset, y_Offset, false, addMoney, changeData);
-				} else {
-					resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
-							new PDPageContentStream(document, document.getPage(0),
-									PDPageContentStream.AppendMode.APPEND, true),
-							x_pos, y_pos, x_Offset, y_Offset, false, addMoney, changeData);
-
-				}
+				resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
+						new PDPageContentStream(document, document.getPage(0),
+								PDPageContentStream.AppendMode.APPEND, true),
+						x_pos, y_pos, x_Offset, y_Offset, false, addMoney);
+			
+//				if (changeData) {
+//					resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
+//							new PDPageContentStream(document, document.getPage(0),
+//									PDPageContentStream.AppendMode.OVERWRITE, true),
+//							x_pos, y_pos, x_Offset, y_Offset, false, addMoney);
+//				} else {
+//					resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
+//							new PDPageContentStream(document, document.getPage(0),
+//									PDPageContentStream.AppendMode.APPEND, true),
+//							x_pos, y_pos, x_Offset, y_Offset, false, addMoney);
+//
+//				}
 
 				document.close();
 				// System.out.println(" else myObjPDF.createNewFile()
@@ -111,7 +115,7 @@ public class PDFCreator {
 	 */
 	public Boolean addPaymentInformation(Object object, PDDocument document, PDPage page,
 			PDPageContentStream contentStream, int tX, int tY, int x_Offset, int y_Offset, boolean firstWrite,
-			boolean addMoney, boolean changeData) throws IOException {
+			boolean addMoney) throws IOException {
 		int i = 0;
 		float j = 0;
 
@@ -125,7 +129,7 @@ public class PDFCreator {
 			 * First write.
 			 */
 
-			if (firstWrite || changeData) {
+			if (firstWrite) {
 				contentStream.newLineAtOffset(tX + x_Offset, y_Offset);
 				contentStream.showText(LocalDate.now().toString());
 				contentStream.newLineAtOffset(tX - x_Offset, -y_Offset);

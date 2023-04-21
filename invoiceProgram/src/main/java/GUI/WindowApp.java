@@ -6,16 +6,23 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.TreeMap;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -36,52 +43,27 @@ public class WindowApp extends JFrame implements ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	/**
-	 * Frame Variable static - needed to share exactly the same variable between
-	 * parent and child (not a copy of var)
-	 */
-	//
 	private static JFrame windowFrame;
-	// private static JPanel windowPanelTax;
 	private static JPanel windowPanelSeller;
 	private static JPanel windowPanelBuyer;
 	private JSplitPane windowSplit;
-	private int widthWindowMain = 500;
-	private int heightWindowMain = 500;
+	private static final int widthWindowMain = 500;
+	private static final int heightWindowMain = 500;
 
-	private int rowSeller = 2 * (new DataOfAll(1).findSize()) + 3;
-	private int collSeller = 1;
-	private int rowBuyer = 2 * (new DataOfAll(2).findSize()) + 5;
-	private int collBuyer = 1;
+	private static final int rowSeller = 2 * (new DataOfAll(1).findSize()) + 3;
+	private static final int collSeller = 1;
+	private static final int rowBuyer = 2 * (new DataOfAll(2).findSize()) + 5;
+	private static final int collBuyer = 1;
 
 	private static JButton confirmButtonSeller;
 	private static JButton clearButtonSeller;
 	private static JButton confirmButtonBuyer;
 	private static JButton clearButtonBuyer;
-	private static JButton deleteButton;
 	private static JButton closeButton;
-	private static boolean doNotClear = false;
 	private static JLabel infoLabelSeller;
 	private static JLabel infoLabelBuyer;
 
 	private String message = "";
-
-	/**
-	 * Auxiliary booleans
-	 */
-	/**
-	 * conditionFlag_1/2 - > do one or another one
-	 */
-	private static boolean conditionFlag_1 = false;
-	/**
-	 * conditionFlag_1/2 - > do one or another one
-	 */
-	private static boolean conditionFlag_2 = false;
-
-	/**
-	 * conditionFlag_3 - > if true then do always after TAX
-	 */
-	private static boolean conditionFlag_3 = false;
 
 	/**
 	 * Go to the next step.
@@ -91,12 +73,7 @@ public class WindowApp extends JFrame implements ActionListener {
 	 * Go to the next step.
 	 */
 	private static boolean proceedFlag_2 = false;
-	/**
-	 * Go to the next step.
-	 */
-	private static int iteratorChangeData = 0;
 
-	private static boolean changeData = false;
 
 	private String VATValue = "";
 	/**
@@ -118,14 +95,13 @@ public class WindowApp extends JFrame implements ActionListener {
 	 */
 
 	public WindowApp() {
-
 		init();
 
 	}
 
 	/**
 	 * Tricky builder. Allows inheritance between WindowApp and child. This makes it
-	 * possible to call the "zero" constructor and override the remainder method
+	 * possible to call the constructor which does nothing and override the methods
 	 * without any issues.
 	 */
 	public WindowApp(String VATValue) {
@@ -140,9 +116,10 @@ public class WindowApp extends JFrame implements ActionListener {
 
 		/**
 		 * Inner class - TAX INFO.
+		 * This class was created as an internal one because it seems to be much easier than creating a new separted class.
 		 */
 
-		class TaxChoiceLocal {
+		class TaxChoice {
 
 			private JLabel infoLabelTax;
 			private JButton confirmTax;
@@ -156,11 +133,11 @@ public class WindowApp extends JFrame implements ActionListener {
 			String list[] = { "oo.", "np.", "zw.", "0%", "5%", "7%", "8%", "23%" };
 			JComboBox<Object> taxList = new JComboBox<Object>(list);
 
-			private TaxChoiceLocal() {
-				initLocal();
+			private TaxChoice() {
+				initTaxChoice();
 			}
 
-			private void initLocal() {
+			private void initTaxChoice() {
 
 				windowFrameLocal = new JFrame();
 				// windowFrameLocal.setAlwaysOnTop(true);
@@ -189,21 +166,21 @@ public class WindowApp extends JFrame implements ActionListener {
 
 							if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF()) {
 
-								message = errorEncounteredNoneEmptyField(theMiracleOfCreation(pdfObject, windowPanelTax, 4, 75,
-										750, 350, 30, false, changeData));
+								message = errorEncounteredNoneEmptyField(theMiracleOfCreation(pdfObject, windowPanelTax,
+										4, 75, 750, 350, 30, false));
 
 								// confirmTax.setText("Close");
 								confirmTax.setEnabled(false);
 								deleteTax.setEnabled(false);
 
-								pdfNewByteArray=readAllBytesFromThePDF(absPathPDF, pdfNewByteArray);
+								pdfNewByteArray = readAllBytesFromThePDF(absPathPDF, pdfNewByteArray);
 
 							} else {
 								message = "File already exists.";
 								confirmTax.setEnabled(false);
 								deleteTax.setEnabled(true);
 							}
-							
+
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							message = "Error.";
@@ -211,7 +188,7 @@ public class WindowApp extends JFrame implements ActionListener {
 						}
 
 						// JLabel infoLabelTax = null;
-						ifcheckStatusOfLabel_TEMP(infoLabelTax, windowPanelTax);
+						ifcheckStatusOfLabel(infoLabelTax, windowPanelTax);
 						infoLabelTax = createJLabel(infoLabelTax, windowPanelTax, message);
 
 					}
@@ -227,8 +204,6 @@ public class WindowApp extends JFrame implements ActionListener {
 								infoLabelTax = deleteTheFile(infoLabelTax, windowPanelTax, clearButtonBuyer,
 										clearButtonBuyer, message);
 								setButtonsOff();
-								// deleteButton.setEnabled(false);
-								conditionFlag_3 = false;
 							} else {
 								message = "Unable to delete the file!";
 							}
@@ -240,14 +215,13 @@ public class WindowApp extends JFrame implements ActionListener {
 						}
 						confirmTax.setEnabled(true);
 						deleteTax.setEnabled(false);
-						ifcheckStatusOfLabel_TEMP(infoLabelTax, windowPanelTax);
+						ifcheckStatusOfLabel(infoLabelTax, windowPanelTax);
 						infoLabelTax = createJLabel(infoLabelTax, windowPanelTax, message);
 					}
 				});
 
 				closeTax.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						conditionFlag_3 = true;
 						setButtonsOn();
 
 						closeButton.setEnabled(true);
@@ -279,7 +253,7 @@ public class WindowApp extends JFrame implements ActionListener {
 								taxValue = taxList.getItemAt(taxList.getSelectedIndex()).toString();
 								VATValue = taxValue;
 
-								// ifcheckStatusOfLabel_TEMP(infoLabelTax, windowPanel);
+								// ifcheckStatusOfLabel(infoLabelTax, windowPanel);
 								// infoLabelTax = createJLabel(infoLabelTax, windowPanel, message);
 
 							}
@@ -308,7 +282,7 @@ public class WindowApp extends JFrame implements ActionListener {
 		windowFrame.pack();
 		windowFrame.setResizable(false);
 		windowFrame.setVisible(true);
-		new TaxChoiceLocal();
+		new TaxChoice();
 		/**
 		 * TOP PANEL.
 		 */
@@ -387,77 +361,30 @@ public class WindowApp extends JFrame implements ActionListener {
 	 * Initialize the actions [2]
 	 */
 	public void doTheThings_actionPerformed(ActionEvent e) throws IOException {
+
 		switch (e.getActionCommand()) {
 
 		case "Confirm Data of Seller":
 
 			try {
-
-				if (pdfObject.checkIfAFIleIsAlreadyExistingPDF()
-						&& ((!conditionFlag_1 && conditionFlag_2) || conditionFlag_3)) {
-					// theMiracleOfCreation(pdfObject, windowPanelSeller, 1, 5, 700, 530, 30, false,
-					// changeData);
-
-message=	errorEncounteredNoneEmptyField(
-							theMiracleOfCreation(pdfObject, windowPanelSeller, 1, 5, 700, 530, 30, false, changeData));
-
-					confirmButtonSeller.setEnabled(false);
-					clearButtonSeller.setEnabled(false);
-					conditionFlag_1 = true;
-					conditionFlag_2 = false;
-					conditionFlag_3 = false;
-				} else {
-					if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF()) {
-						message = "There is no existing file!";
-						setButtonsOff();
-					} else {
-						message = "Error";
-					}
-				}
-				// }
-
+				message = confrimDataMethod(pdfObject,message,windowPanelSeller, 1, 5, 700, 530, 30, false, confirmButtonSeller,
+						clearButtonSeller);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 				message = "Error";
 
 			}
 
-///////////////////////////////////////////////just for now, gonna be deleted in the future////
-			ifcheckStatusOfLabel_TEMP(infoLabelSeller, windowPanelSeller);
-///////////////////////////////////////////////just for now, gonna be deleted in the future////
-
+			ifcheckStatusOfLabel(infoLabelSeller, windowPanelSeller);
 			infoLabelSeller = createJLabel(infoLabelSeller, windowPanelSeller, message);
-
 			proceedFlag_1 = true;
-			changeData = false;
+
 			break;
 
 		case "Confirm Data of Buyer":
 			try {
 
-				if (pdfObject.checkIfAFIleIsAlreadyExistingPDF()
-						&& ((conditionFlag_1 && !conditionFlag_2) || conditionFlag_3)) {
-
-					// message = "Append data to the file.";
-				message=	errorEncounteredNoneEmptyField(
-							theMiracleOfCreation(pdfObject, windowPanelBuyer, 2, 350, 700, 0, 0, false, changeData));
-
-					confirmButtonBuyer.setEnabled(false);
-					clearButtonBuyer.setEnabled(false);
-					conditionFlag_1 = false;
-					conditionFlag_2 = true;
-					conditionFlag_3 = false;
-				} else {
-					if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF()) {
-						message = "There is no existing file!";
-						setButtonsOff();
-					} else {
-						message = "Error";
-					}
-
-					setButtonsOff();
-				}
-				// }
+				message = confrimDataMethod(pdfObject,message,windowPanelBuyer, 2, 350, 700, 0, 0, false, confirmButtonBuyer, clearButtonBuyer);
 
 			} catch (Exception e1) {
 
@@ -466,14 +393,11 @@ message=	errorEncounteredNoneEmptyField(
 
 			}
 
-///////////////////////////////////////////////just for now, gonna be deleted in the future////
-			ifcheckStatusOfLabel_TEMP(infoLabelBuyer, windowPanelBuyer);
-///////////////////////////////////////////////just for now, gonna be deleted in the future////		
-
+			ifcheckStatusOfLabel(infoLabelBuyer, windowPanelBuyer);
 			infoLabelBuyer = createJLabel(infoLabelBuyer, windowPanelBuyer, message);
 
 			proceedFlag_2 = true;
-			changeData = false;
+			//changeData = false;
 			break;
 
 		case "Clear Data of Seller":
@@ -494,67 +418,79 @@ message=	errorEncounteredNoneEmptyField(
 
 		repaintFrame(windowFrame);
 
-		nextWindow(proceedFlag_1, proceedFlag_2, changeData, iteratorChangeData, pdfObject, windowFrame);
+		nextWindow(proceedFlag_1, proceedFlag_2, pdfObject, windowFrame);
 
 	}
 
-////////////very temp method - gonna be changed///////////////////
-	protected void ifcheckStatusOfLabel_TEMP(JLabel infoLabel, JPanel windowPanel) {
-		if (!checkStatusOfLabel(infoLabel, windowPanel)) {
-			// System.out.println("CHECK INFO LABEL");
-			// delete existing "delete" JLabel
-			windowPanel.remove(infoLabel);
+	/**
+	 * Confirm method. This method contains statements for the Seller/Buyer.
+	 */
+	protected String confrimDataMethod(PDFCreator pdfObject2,String message2, JPanel windowPanel, int clientchoice, int xpos, int ypos,
+			int xoffset, int yoffset, boolean addMoney, JButton confirmButton,
+			JButton clearButton) {
+		if (pdfObject2.checkIfAFIleIsAlreadyExistingPDF()) {
+			message2 = errorEncounteredNoneEmptyField(theMiracleOfCreation(pdfObject2, windowPanel, clientchoice, xpos,
+					ypos, xoffset, yoffset, addMoney));
+			confirmButton.setEnabled(false);
+			clearButton.setEnabled(false);
+		} else {
+			if (!pdfObject2.checkIfAFIleIsAlreadyExistingPDF()) {
+				message2 = "There is no existing file!";
+				setButtonsOff();
+			} else {
+				message2 = "Error";
+			}
+			setButtonsOff();
+		}
+		return message2;
+	}
 
+	/**
+	 * This method is required due to the specific settings of flags during
+	 * overwriting.
+	 */
+
+	protected void setSpecificStateOfFlags(boolean state) {
+		if (state) {
+		} else {
 		}
 	}
-////////////////////////////////////////
+
+	protected void ifcheckStatusOfLabel(JLabel infoLabel, JPanel windowPanel) {
+		if (!checkStatusOfLabel(infoLabel, windowPanel)) {
+			windowPanel.remove(infoLabel);
+		}
+	}
 
 	/**
 	 * Next Window Decision.
-	 * 
-	 * 0 - yes 1 - CHANGE DATA
 	 */
 
-	void nextWindow(boolean flag, boolean flag1, boolean changeData2, int iteratorChangeData, PDFCreator pdfObject2,
+	void nextWindow(boolean flag, boolean flag1, PDFCreator pdfObject2,
 			JFrame windowFrame2) throws IOException {
 
 		int proceed;
 
 		if (flag1 && flag && pdfObject2.checkIfAFIleIsAlreadyExistingPDF()) {
-			if (iteratorChangeData < 1) {
-				Object[] options = { "OK", "CHANGE DATA" };
-				proceed = JOptionPane.showOptionDialog(windowFrame,
-						"All data confirmed, pdf file has been created. Proceed?", "Warning",
-						JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
-				iteratorChangeData = iteratorChangeData + 1;
-			} else {
-				Object[] options2 = { "OK" };
-				proceed = JOptionPane.showOptionDialog(windowFrame,
-						"All data confirmed, pdf file has been updated. Proceed?", "Warning",
-						JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options2, options2[0]);
-				setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-			}
+			Object[] options = { "OK", "CHANGE DATA" };
+			proceed = JOptionPane.showOptionDialog(windowFrame,
+					"All data confirmed, pdf file has been created. Proceed?", "Warning", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 
 			switch (proceed) {
 			case 0:
-
 				windowFrame2.dispose();
 				new GUI.Service(getVat());
 				break;
 			case 1:
 				restoreSavedByteArrayAsAFile(absPathPDF, pdfNewByteArray);
 				clearEverything();
-
-				conditionFlag_3 = true;
-				// File pdfOld = new File(absPathPDF);
-				
 				break;
 			default:
 			}
 
 		} else {
 			Object[] options = { "OK" };
-			System.out.println(pdfObject2.checkIfAFIleIsAlreadyExistingPDF());
 			if (flag1 && flag && !pdfObject2.checkIfAFIleIsAlreadyExistingPDF()) {
 				proceed = JOptionPane.showOptionDialog(windowFrame, "File dosen't exist!", "Warning",
 						JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
@@ -566,61 +502,48 @@ message=	errorEncounteredNoneEmptyField(
 
 	/**
 	 * The byte array created is used to restore the "old" pdf file and allows you
-	 * to overwrite it. PDFBOX allows you to overwrite a file by delete its
-	 * previous contents. A better solution for this functionality needs to be
-	 * found.
+	 * to. overwrite it. PDFBOX allows you to overwrite a file by removing its
+	 * previous content. A better solution for this functionality should be found.
 	 * 
-	 * @param byteArray
 	 */
 
 	protected void restoreSavedByteArrayAsAFile(String path, byte[] byteArray) {
-		System.out.println("Test: before delete");
 		new File(path).delete();
-		System.out.println("After: before delete");
 		OutputStream out;
 		try {
 
 			out = new FileOutputStream(path);
 			out.write(byteArray);
 			out.close();
-			System.out.println("Stream close");
-			System.out.println("Path "+path);
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
 
 	/**
-	 * Creating temporary "backup" of file as a byte array.
-	 * @return 
+	 * Creating temporary "backup" of file as a byte array. Not so nice way, needs
+	 * improvement
 	 */
 
 	protected byte[] readAllBytesFromThePDF(String path, byte[] byteArray) {
 		byteArray = null;
 		try {
 			byteArray = Files.readAllBytes(Paths.get(path));
-			
+
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		return byteArray;
-		
+
 	}
 
 	/**
-	 * Creating specific Object [1]
+	 * Creating specific Object [1]. Read fields and convert them into the TreeMap
 	 */
 
 	Client createClientObject(Client clientInInfos, JPanel windowPanel, int clientchoice) {
-		// SellerClass sellerInInfos = new SellerClass();
-
-		///////////////// iterate through Jpanel
-		/// https://stackoverflow.com/questions/1037139/loop-through-jpanel
 		int z = 0;
 		int k = 0;
 		clientInInfos.clearTreeMap();
@@ -630,17 +553,7 @@ message=	errorEncounteredNoneEmptyField(
 //			It's also known as a type comparison operator because it compares the instance with the type.
 			if (c instanceof JTextField || c instanceof JComboBox) {
 
-//				((JTextField) c).getText();
-//				if (((JTextField) c).getText().equals("")) {
-//					JOptionPane.showMessageDialog(null, "FILL UP ALL TEXT FIELDS " + z, "ALERT MESSAGE",
-//							JOptionPane.WARNING_MESSAGE);
-//					// clientInInfos=null;
-//					break;
-//				}
-//				
 				if (z % 2 != 0) {
-
-					// add to HASHMAP Object
 					if (c instanceof JTextField) {
 						clientInInfos.fillUpTheMap(clientObjectChoice(k, clientchoice).toString(),
 								((JTextField) c).getText());
@@ -661,26 +574,44 @@ message=	errorEncounteredNoneEmptyField(
 		return clientInInfos;
 	}
 
-	/**
-	 * Creating specific Object [2]
-	 * 
-	 * @return
-	 */
+	private void saveAsTheByte(TreeMap<String, String> object) {
+		try {
+			// Serialize the TreeMap object
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(object);
 
-	protected Boolean theMiracleOfCreation(PDFCreator object, JPanel windowPanel, int clientchoice, int x_pos,
-			int y_pos, int x_Offset, int y_Offset, boolean addMoney, boolean changeData) {
-		Boolean checkIfError;
-		// just do the things
-		// createClientObject(new Client(), windowPanel, decision).displayInInfos();
-		createClientObject(new Client(), windowPanel, clientchoice);
-		checkIfError = object.makeAFile(createClientObject(new Client(), windowPanel, clientchoice).getClientMap(),
-				x_pos, y_pos, x_Offset, y_Offset, addMoney, changeData);
-	//	System.out.println("Check if error: " + checkIfError);
-		return checkIfError;
+			// Convert the ByteArrayOutputStream to a byte array
+			byte[] bytes = baos.toByteArray();
+
+			// Print the byte array
+			for (byte b : bytes) {
+				System.out.print(b + " ");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
-	 * Getting and adding names of fields
+	 * Creating specific Object [2] Creation of a pdf file. Additional error
+	 * checking that all fields are filled in (this return state from the
+	 * addPaymentInformation method).
+	 * 
+	 */
+
+	protected Boolean theMiracleOfCreation(PDFCreator object, JPanel windowPanel, int clientchoice, int x_pos,
+			int y_pos, int x_Offset, int y_Offset, boolean addMoney) {
+		Boolean checkIfError;
+
+		checkIfError = object.makeAFile(createClientObject(new Client(), windowPanel, clientchoice).getClientMap(),
+				x_pos, y_pos, x_Offset, y_Offset, addMoney);
+			return checkIfError;
+	}
+
+	/**
+	 * Getting and adding names of fields[1] Getting name from the DataOfAll class.
 	 */
 
 	String clientObjectChoice(int i, int clientchoice) {
@@ -693,22 +624,24 @@ message=	errorEncounteredNoneEmptyField(
 	}
 
 	/**
-	 * Getting and adding names of fields [2]
+	 * Getting and adding names of fields [2] Adding names to the window frame and
+	 * display them.
 	 */
 	protected void panelDisplay(JPanel windowPanel, int clientchoice) {
 
 		for (int i = 0; i < new DataOfAll(clientchoice).findSize(); i++) {
 			windowPanel.add(new JLabel(clientObjectChoice(i, clientchoice)));
-			// System.out.println("VAT "+VATValue);
+			/**
+			 * Special conditions, these fields cannot be editable.
+			 */
 			if (clientchoice == 3) {
 
 				String a = new JLabel(clientObjectChoice(i, clientchoice)).getText();
 
-				if (a == "07.VAT rate") {
-					// System.out.println("VAT check " + this.VATValue);
+				if (a.equals("07.VAT rate")) {
+					// //System.out.println("VAT check " + this.VATValue);
 					((JTextComponent) windowPanel.add(new JTextField(this.VATValue))).setEditable(false);
-				} else if (a == "08.Net value" || a == "09.VAT amount" || a == "10.Gross value") {
-					doNotClear = true;
+				} else if (a.equals("08.Net value") || a.equals ("09.VAT amount")|| a.equals("10.Gross value")) {
 					((JTextComponent) windowPanel.add(new JTextField(""))).setEditable(false);
 
 				} else {
@@ -723,7 +656,7 @@ message=	errorEncounteredNoneEmptyField(
 	}
 
 	/**
-	 * Getting and adding names of fields [3]
+	 * Getting and adding names of fields [3] Method for the Label creating.
 	 */
 
 	JLabel createJLabel(JLabel infoLabel, JPanel windowPanel, String message) {
@@ -754,22 +687,17 @@ message=	errorEncounteredNoneEmptyField(
 	 */
 	protected JLabel clearData(JLabel infoLabel, JPanel windowPanel, JButton confirmButton, JButton clearButton,
 			boolean b) {
-		// System.out.println(" ");
-
-		// delete existing "confirm" JLabel
 		if (!checkStatusOfLabel(infoLabel, windowPanel)) {
 
 			windowPanel.remove(infoLabel);
 			clearOnlyPanel(windowPanel, infoLabel, confirmButton, clearButton, b);
+		} else {
+			clearOnlyPanel(windowPanel, infoLabel, confirmButton, clearButton, b);
 		}
-
-		// creating JLabel for the delete message
 		infoLabel = createJLabel(infoLabel, windowPanel, "Cleared");
 		confirmButton.setEnabled(true);
 		clearButton.setEnabled(false);
 		return infoLabel;
-
-		// System.out.println("Clear Data of Buyer");
 	}
 
 	/**
@@ -778,10 +706,7 @@ message=	errorEncounteredNoneEmptyField(
 	static void clearOnlyPanel(JPanel panelToClean, JLabel infoLabel, JButton BtnConfirm, JButton BtnClear,
 			boolean choice) {
 
-		// if the file already exists but the delete button was pressed first then skip
-		// instruction
-		// System.out.println(infoLabel.toString());
-		if (infoLabel != null ) {
+		if (infoLabel != null) {
 
 			panelToClean.remove(infoLabel);
 		}
@@ -818,8 +743,6 @@ message=	errorEncounteredNoneEmptyField(
 	 * Setting Flags
 	 */
 	static void setFlagsFalse() {
-		conditionFlag_1 = false;
-		conditionFlag_2 = false;
 		proceedFlag_1 = false;
 		proceedFlag_2 = false;
 	}
@@ -845,7 +768,7 @@ message=	errorEncounteredNoneEmptyField(
 	}
 
 	/**
-	 * Call to delete
+	 * Call to Delete the file method
 	 */
 	protected JLabel deleteTheFile(JLabel infoLabel, JPanel windowPanel, JButton clearButton, JButton clearButton2,
 			String message) {
@@ -865,7 +788,32 @@ message=	errorEncounteredNoneEmptyField(
 	}
 
 	/**
-	 * Additional file operations
+	 * Internal test method Check if Label exists of not
+	 */
+	boolean checkStatusOfLabel(JLabel infoLabel, JPanel windowPanel) {
+		boolean flaghelp;
+		if (infoLabel != null) {
+			// //System.out.println("Confirmed NOT NULL");
+			flaghelp = false;
+		} else {
+			// //System.out.println("Confirmed IS NULL");
+			flaghelp = true;
+
+		}
+		return flaghelp;
+	}
+
+	/**
+	 * Getting Vat value
+	 */
+	protected String getVat() {
+		// //System.out.println("getVAt" + VATValue);
+		return this.VATValue;
+	}
+
+	/**
+	 * Set a specific message depending on whether the file has been deleted or not
+	 *
 	 */
 	String deleteFlagGUI(PDFCreator deleteFile, boolean flagAppWindow) {
 		clearEverything();
@@ -880,39 +828,15 @@ message=	errorEncounteredNoneEmptyField(
 	}
 
 	/**
-	 * Internal test method
-	 */
-	boolean checkStatusOfLabel(JLabel infoLabel, JPanel windowPanel) {
-		boolean flaghelp;
-		if (infoLabel != null) {
-			// System.out.println("Confirmed NOT NULL");
-			flaghelp = false;
-		} else {
-			// System.out.println("Confirmed IS NULL");
-			flaghelp = true;
-
-		}
-		return flaghelp;
-	}
-
-	/**
-	 * Getting Vat value
-	 */
-	protected String getVat() {
-		// System.out.println("getVAt" + VATValue);
-		return this.VATValue;
-	}
-
-	/**
 	 * Get the result of the function check from PDFCreator if the field is empty.
 	 * Set a specific message.
-	 * @return 
 	 */
 	protected String errorEncounteredNoneEmptyField(Boolean booleanCheck) {
 		if (booleanCheck) {
 			message = "Confirmed. Successfully wrote/append to the file.";
 		} else {
 			message = "Error encountered.";
+			setFlagsFalse();
 			setButtonsOff();
 		}
 		return message;

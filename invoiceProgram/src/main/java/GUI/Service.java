@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import Client.Client;
 import Client.DataOfAll;
 import Data.PDFCreator;
 
@@ -30,21 +31,20 @@ public class Service extends WindowApp implements ActionListener {
 	private JFrame windowFrame;
 	private JPanel windowPanel;
 	private static JLabel infoLabel;
-	private int widthWindowMain = (int) (37.5 * new DataOfAll(3).findSize());// 600
-	private int heightWindowMain = (int) (37.5 * new DataOfAll(3).findSize());
-	private int row = 2 * (new DataOfAll(3).findSize()) + 5;
-	private int coll = 1;
+	private static final int widthWindowMain = (int) (37.5 * new DataOfAll(3).findSize());// 600
+	private static final  int heightWindowMain = (int) (37.5 * new DataOfAll(3).findSize());
+	private static final int row = 2 * (new DataOfAll(3).findSize()) + 5;
+	private static final int coll = 1;
 	private static final long serialVersionUID = 1L;
 	private static JButton confirmButton;
 	private static JButton clearButton;
 	private static JButton deleteButton;
 	private static JButton closeButton;
 	private String message = "";
-	private String VATValue;
-	final private String absPathPDF = System.getProperty("user.dir") + "\\Invoice_" + LocalDate.now() + ".pdf";
+	private static final String absPathPDF = System.getProperty("user.dir") + "\\Invoice_" + LocalDate.now() + ".pdf";
 
 	private static boolean conditionFlag_1 = false;
-	private static boolean changeData = false;
+	//private static boolean changeData = false;
 	private byte[] pdfNewByteArray = new byte[8192];
 
 	/**
@@ -122,27 +122,22 @@ public class Service extends WindowApp implements ActionListener {
 
 			// pdfNewByteArray = readAllBytesFromThePDF(absPathPDF, pdfNewByteArray);
 
-			infoLabel = confirmOrOverwrite(options, changeData, conditionFlag_1, pdfObject, windowPanel, infoLabel,
+			infoLabel = confirmOrOverwrite(options, conditionFlag_1, pdfObject, windowPanel, infoLabel,
 					confirmButton, clearButton, deleteButton, windowFrame, message);
 
 			conditionFlag_1 = true;
 			confirmButton.setEnabled(false);
-
+						
 			break;
 		case "Overwrite":
-
-			// restoreSavedByteArrayAsAFile(absPathPDF, pdfNewByteArray);
-			infoLabel = confirmOrOverwrite(options, changeData, conditionFlag_1, pdfObject, windowPanel, infoLabel,
+			infoLabel = confirmOrOverwrite(options, conditionFlag_1, pdfObject, windowPanel, infoLabel,
 					confirmButton, clearButton, deleteButton, windowFrame, message);
 			confirmButton.setEnabled(false);
-			// System.out.println("conditionFlag_1 " + proceedFlag_2);
 			break;
 		case "Clear Data":
 
 			confirmButton.setText("Overwrite");
 			confirmButton.setEnabled(true);
-			changeData = false;
-
 			infoLabel = clearData(infoLabel, windowPanel, confirmButton, clearButton, true);
 			break;
 
@@ -155,6 +150,8 @@ public class Service extends WindowApp implements ActionListener {
 			break;
 		case "Close":
 			windowFrame.dispose();
+			
+
 		default:
 		}
 	}
@@ -176,7 +173,7 @@ public class Service extends WindowApp implements ActionListener {
 			for (Component c : windowPanel.getComponents()) {
 
 				if (c instanceof JLabel) {
-					if (((JLabel) c).getText().toString() == "07.VAT rate") {
+					if (((JLabel) c).getText().toString().equals("07.VAT rate") ) {
 						tempBoolean = false;
 					} else {
 						tempBoolean = true;
@@ -201,7 +198,7 @@ public class Service extends WindowApp implements ActionListener {
 	/**
 	 * Confirm or overwrite
 	 */
-	protected JLabel confirmOrOverwrite(Object[] options, boolean changeData, boolean conditionFlag_1,
+	protected JLabel confirmOrOverwrite(Object[] options, boolean conditionFlag_1,
 			PDFCreator pdfObject, JPanel windowPanel, JLabel infoLabel, JButton confirmButton, JButton clearButton,
 			JButton deleteButton, JFrame windowFrame, String message) {
 
@@ -215,8 +212,9 @@ public class Service extends WindowApp implements ActionListener {
 
 			if (pdfObject.checkIfAFIleIsAlreadyExistingPDF()) {
 
+				
 				message = errorEncounteredNoneEmptyField(
-						theMiracleOfCreation(pdfObject, windowPanel, 3, 5, 500, 0, 0, true, changeData));
+						theMiracleOfCreation(pdfObject, windowPanel, 3, 5, 500, 0, 0, true));
 				confirmButton.setEnabled(true);
 				clearButton.setEnabled(true);
 				conditionFlag_1 = true;
