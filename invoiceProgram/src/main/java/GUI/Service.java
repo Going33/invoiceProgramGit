@@ -109,7 +109,7 @@ public class Service extends WindowApp implements ActionListener {
 		// int proceed;
 		switch (e.getActionCommand()) {
 		case "Confirm Data":
-			// System.out.println(" ");
+			// //System.out.println(" ");
 
 			// pdfNewByteArray = readAllBytesFromThePDF(absPathPDF, pdfNewByteArray);
 
@@ -133,7 +133,7 @@ public class Service extends WindowApp implements ActionListener {
 			break;
 
 		case "Delete the file":
-			// System.out.println(" tutaj Delete the file");
+			// //System.out.println(" tutaj Delete the file");
 			message = deleteFlagGUI(new PDFCreator(), false);
 			infoLabel = deleteTheFile(infoLabel, windowPanel, clearButton, clearButton,message);
 			confirmButton.setEnabled(false);
@@ -217,7 +217,7 @@ public class Service extends WindowApp implements ActionListener {
 				deleteButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						windowFrame.dispose();
-						// System.out.println("LAMBDA TEST");
+						// //System.out.println("LAMBDA TEST");
 					}
 				});
 

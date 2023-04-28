@@ -58,7 +58,7 @@ public class WindowApp extends JFrame implements ActionListener {
 	private static JButton closeButton;
 	private static JLabel infoLabelTop;
 	private static JLabel infoLabelBottom;
-
+	public static int test = 2;
 	private String message = "";
 
 	/**
@@ -69,9 +69,15 @@ public class WindowApp extends JFrame implements ActionListener {
 	 * Go to the next step.
 	 */
 	private static boolean proceedFlag_2 = false;
-
-	public String taxValue = "";
-	public static String currValue = "";
+	/**
+	 * "Static" To use these variables in the any other class.
+	 */
+	public static String taxValue = "";
+	/**
+	 * "Static" To use these variables in the any other class. If no currency is
+	 * selected, the default is PLN.
+	 */
+	public static String currValue = "PLN";
 	/**
 	 * Path of the file.
 	 */
@@ -101,8 +107,8 @@ public class WindowApp extends JFrame implements ActionListener {
 	 * without any issues.
 	 */
 	public WindowApp(String taxValue, String currValue) {
-		this.taxValue = taxValue;
-		this.currValue = currValue;
+		WindowApp.taxValue = taxValue;
+		WindowApp.currValue = currValue;
 	}
 
 	/**
@@ -124,9 +130,7 @@ public class WindowApp extends JFrame implements ActionListener {
 			private JButton closeTax;
 			private int rowTax = 10;
 			private int collTax = 1;
-			private String[] userChoice = new String[2];
 			private boolean notPressedC = false;
-			private boolean notPressedD = false;
 			JPanel windowPanelTax;
 			JFrame windowFrameLocal;
 			private final String listVAT[] = { "oo.", "np.", "zw.", "0%", "5%", "7%", "8%", "23%" };
@@ -158,19 +162,19 @@ public class WindowApp extends JFrame implements ActionListener {
 				deleteTax = new JButton("Delete File");
 				closeTax = new JButton("Close");
 
-				
-				if(pdfObject.checkIfAFIleIsAlreadyExistingPDF())
-				{
+				if (pdfObject.checkIfAFIleIsAlreadyExistingPDF()) {
 					deleteTax.setEnabled(true);
-				}else {
+					// confirmTax.setEnabled(false);
+				} else {
 					deleteTax.setEnabled(false);
+					confirmTax.setEnabled(true);
 				}
-				
+
 				VATListPanel(windowPanelTax, 4, vList, cList);
 				// taxValue = userChoice[0];
-				System.out.println(taxValue);
+				//System.out.println(taxValue);
 				// currValue = userChoice[1];
-				System.out.println(currValue);
+				//System.out.println(currValue);
 				repaintFrame(windowFrameLocal);
 
 				confirmTax.addActionListener(new ActionListener() {
@@ -180,6 +184,10 @@ public class WindowApp extends JFrame implements ActionListener {
 
 							if (!pdfObject.checkIfAFIleIsAlreadyExistingPDF()) {
 
+								taxValue = vList.getItemAt(vList.getSelectedIndex()).toString();
+								currValue = cList.getItemAt(cList.getSelectedIndex()).toString();
+
+								//System.out.println("przekaza " + currValue);
 								message = theMiracleOfCreation(pdfObject, windowPanelTax, 4, 75, 750, 350, 30, false);
 
 								// confirmTax.setText("Close");
@@ -195,7 +203,6 @@ public class WindowApp extends JFrame implements ActionListener {
 							}
 
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
 							message = "Error.Cannot create the file";
 							e.printStackTrace();
 						}
@@ -216,14 +223,12 @@ public class WindowApp extends JFrame implements ActionListener {
 								infoLabelTax = deleteTheFile(infoLabelTax, windowPanelTax, clearButtonBottom,
 										clearButtonBottom, message);
 								setButtonsOff();
-							}
+														}
 
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
 							message = "Error. Cannot delete the file";
 							e.printStackTrace();
 						}
-						notPressedD = true;
 						confirmTax.setEnabled(true);
 						deleteTax.setEnabled(false);
 						ifcheckStatusOfLabel(infoLabelTax, windowPanelTax);
@@ -232,8 +237,8 @@ public class WindowApp extends JFrame implements ActionListener {
 				});
 
 				/**
-				 * Press close button to close the Tax Window.
-				 * If the Confirm button is not pressed, then close both windows.
+				 * Press close button to close the Tax Window. If the Confirm button is not
+				 * pressed, then close both windows.
 				 */
 
 				closeTax.addActionListener(new ActionListener() {
@@ -268,27 +273,12 @@ public class WindowApp extends JFrame implements ActionListener {
 					windowPanel.add(new JLabel(clientObjectChoice(i, 4)));
 					if (i == 0) {
 						windowPanel.add(specificList);
-						confirmTax.addActionListener(new ActionListener() {
-
-							public void actionPerformed(ActionEvent e) {
-
-								taxValue = specificList.getItemAt(specificList.getSelectedIndex()).toString();
-							}
-						});
-
 					} else if (i == 2) {
 						windowPanel.add(specificList2);
-						confirmTax.addActionListener(new ActionListener() {
-
-							public void actionPerformed(ActionEvent e) {
-
-								currValue = specificList2.getItemAt(specificList2.getSelectedIndex()).toString();
-							}
-						});
 					} else {
 						LocalDate today = LocalDate.now();
 						DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-						String formattedDate = today.format(dateTimeFormatter); // 17-02-2022
+						String formattedDate = today.format(dateTimeFormatter); // 01-01-1900
 						windowPanel.add(new JTextField(formattedDate + "_"));
 					}
 
@@ -504,7 +494,7 @@ public class WindowApp extends JFrame implements ActionListener {
 			switch (proceed) {
 			case 0:
 				windowFrame2.dispose();
-				new GUI.Service(getVat(),getCurr());
+				new GUI.Service(getVat(), getCurr());
 				break;
 			case 1:
 				restoreSavedByteArrayAsAFile(absPathPDF, pdfNewByteArray);
@@ -610,7 +600,7 @@ public class WindowApp extends JFrame implements ActionListener {
 
 			// Print the byte array
 			for (byte b : bytes) {
-				System.out.print(b + " ");
+				//System.out.print(b + " ");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -663,8 +653,8 @@ public class WindowApp extends JFrame implements ActionListener {
 				String a = new JLabel(clientObjectChoice(i, clientchoice)).getText();
 
 				if (a.equals("07.VAT rate")) {
-					// //System.out.println("VAT check " + this.VATValue);
-					((JTextComponent) windowPanel.add(new JTextField(this.taxValue))).setEditable(false);
+					// ////System.out.println("VAT check " + this.VATValue);
+					((JTextComponent) windowPanel.add(new JTextField(WindowApp.taxValue))).setEditable(false);
 				} else if (a.equals("08.Net value") || a.equals("09.VAT amount") || a.equals("10.Gross value")) {
 					((JTextComponent) windowPanel.add(new JTextField(""))).setEditable(false);
 
@@ -817,10 +807,10 @@ public class WindowApp extends JFrame implements ActionListener {
 	boolean checkStatusOfLabel(JLabel infoLabel, JPanel windowPanel) {
 		boolean flaghelp;
 		if (infoLabel != null) {
-			// //System.out.println("Confirmed NOT NULL");
+			// ////System.out.println("Confirmed NOT NULL");
 			flaghelp = false;
 		} else {
-			// //System.out.println("Confirmed IS NULL");
+			// ////System.out.println("Confirmed IS NULL");
 			flaghelp = true;
 
 		}
@@ -831,16 +821,18 @@ public class WindowApp extends JFrame implements ActionListener {
 	 * Getting Vat value
 	 */
 	public String getVat() {
-		// //System.out.println("getVAt" + VATValue);
+		// ////System.out.println("getVAt" + VATValue);
 		return taxValue;
 	}
+
 	/**
 	 * Getting currency choice
 	 */
 	public String getCurr() {
-		System.out.println("currValue " + currValue);
+		//System.out.println("currValue " + currValue);
 		return currValue;
 	}
+
 	/**
 	 * Set a specific message depending on whether the file has been deleted or not
 	 *

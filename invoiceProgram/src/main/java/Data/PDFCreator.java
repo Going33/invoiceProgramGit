@@ -5,6 +5,7 @@ import java.io.IOException; // Import the IOException class to handle errors
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -29,13 +30,16 @@ public class PDFCreator {
 	private String VATRate = "";
 	private String Qty = "";
 	private String unitPrice = "";
-	String VATAmount = "";
-	Float netto;
-	String nettostring = "";
-	final private int fontSizeValue = 12;
-	Boolean emptyFieldState;
-	Boolean resultOfaddPaymentInformation;
-	
+	private String VATAmount = "";
+	private Float netto;
+	private String nettostring = "";
+	final private int fontSizeValue = 8;
+	private Boolean emptyFieldState;
+	private Boolean resultOfaddPaymentInformation;
+	private AverageExchangeRate currExchRateObj = new AverageExchangeRate() ;
+	private float currExchRateVal;
+	//private String WindowApp.currValue =WindowApp.currValue;
+
 	/**
 	 * Create pdf file, otherwise overwrite.
 	 * 
@@ -43,12 +47,12 @@ public class PDFCreator {
 	 */
 	public Boolean makeAFile(Map<String, String> allDataMap, int x_pos, int y_pos, int x_Offset, int y_Offset,
 			boolean addMoney) {
-		// System.out.println("makeAFile funkcja " + changeData);
+		// //System.out.println("makeAFile funkcja " + changeData);
 		try {
 
 			if (myObjPDF.createNewFile()) {
-				// System.out.println("File created: " + myObjPDF.getName());
-				// System.out.println(System.getProperty("user.dir"));
+				// //System.out.println("File created: " + myObjPDF.getName());
+				// //System.out.println(System.getProperty("user.dir"));
 				// create a file
 
 				PDDocument document = new PDDocument();
@@ -72,11 +76,10 @@ public class PDFCreator {
 
 			} else {
 				PDDocument document = PDDocument.load(myObjPDF);
-				resultOfaddPaymentInformation = addPaymentInformation(allDataMap, document, document.getPage(0),
-						new PDPageContentStream(document, document.getPage(0),
-								PDPageContentStream.AppendMode.APPEND, true),
+				resultOfaddPaymentInformation = addPaymentInformation(
+						allDataMap, document, document.getPage(0), new PDPageContentStream(document,
+								document.getPage(0), PDPageContentStream.AppendMode.APPEND, true),
 						x_pos, y_pos, x_Offset, y_Offset, false, addMoney);
-			
 
 				document.close();
 			}
@@ -93,17 +96,21 @@ public class PDFCreator {
 	 * seller/buyer is already added, add the next one, if both clients are added
 	 * then add gross.
 	 * 
-	 * @return
+	 * dataAndAverageExchangeRate - this control boolean-variable. If true, it will
+	 * put information about the current date and the current average exchange rate.
 	 */
-	
+
 	public Boolean addPaymentInformation(Object object, PDDocument document, PDPage page,
-			PDPageContentStream contentStream, int tX, int tY, int x_Offset, int y_Offset, boolean firstWrite,
-			boolean addMoney) throws IOException {
+			PDPageContentStream contentStream, int tX, int tY, int x_Offset, int y_Offset,
+			boolean dataAndAverageExchangeRate, boolean addMoney) throws IOException {
 		int i = 0;
 		float j = 0;
 
 		try {
-
+			//System.out.println("tworz date "+WindowApp.currValue);
+			currExchRateVal = (float) currExchRateObj.callExchangeRateMethod(WindowApp.currValue);
+			//System.out.println("Kurs "+currExchRateVal);
+			
 			contentStream.beginText();
 
 			contentStream.setFont(PDType1Font.TIMES_ROMAN, fontSizeValue);
@@ -112,7 +119,7 @@ public class PDFCreator {
 			 * First write.
 			 */
 
-			if (firstWrite) {
+			if (dataAndAverageExchangeRate) {
 				contentStream.newLineAtOffset(tX + x_Offset, y_Offset);
 				contentStream.showText(LocalDate.now().toString());
 				contentStream.newLineAtOffset(tX - x_Offset, -y_Offset);
@@ -121,6 +128,7 @@ public class PDFCreator {
 
 			/**
 			 * If clients data are already added then go addMoney=true. TODO Optimize
+			 * The payment informations
 			 */
 			if (addMoney) {
 				contentStream.newLineAtOffset(0, 0);
@@ -187,7 +195,7 @@ public class PDFCreator {
 								unitPrice = set.getValue();
 								contentStream.showText(set.getKey().toString());
 								contentStream.newLineAtOffset(0, -20);
-								contentStream.showText(set.getValue().toString());
+								contentStream.showText(set.getValue().toString()+" "+WindowApp.currValue);
 								contentStream.newLineAtOffset(0, 20);
 								contentStream.newLineAtOffset(130, 0);
 							} else {
@@ -198,24 +206,25 @@ public class PDFCreator {
 							VATRate = set.getValue();
 							contentStream.showText(set.getKey().toString());
 							contentStream.newLineAtOffset(0, -20);
-							contentStream.showText(set.getValue().toString());
+
+							contentStream.showText(set.getValue().toString());	
 							contentStream.newLineAtOffset(0, 20);
 							contentStream.newLineAtOffset(130, 0);
 						}
 
 						else if (set.getKey() == ("08.Net value")) {
-							
-							//String curr =WindowApp.currValue;
-							//System.out.println("WindowApp.currValue : "+curr);
-							System.out.println("unitPrice " + unitPrice + " Qty " + Qty);
+
+							// String curr =WindowApp.currValue;
+							// //System.out.println("WindowApp.currValue : "+curr);
+							//System.out.println("unitPrice " + unitPrice + " Qty " + Qty);
 							netto = Float.parseFloat(unitPrice) * Float.parseFloat(Qty);
 							nettostring = Double.toString(netto);
-							System.out.println("Netto :" + nettostring);
+							//System.out.println("Netto :" + nettostring);
 							grossValue = countBrutto(nettostring, VATRate);
 							contentStream.showText(set.getKey().toString());
 							contentStream.newLineAtOffset(0, -20);
-							//curr = nettostring.toString() + curr;
-							contentStream.showText(nettostring+" "+WindowApp.currValue);
+							// curr = nettostring.toString() + curr;
+							contentStream.showText(nettostring + " " + WindowApp.currValue+" ("+String.format("%,.2f",netto * currExchRateVal)+" "+AverageExchangeRate.PLN_CODE+")");
 							contentStream.newLineAtOffset(0, 20);
 							contentStream.newLineAtOffset(130, 0);
 							//
@@ -226,15 +235,42 @@ public class PDFCreator {
 							try {
 								temp = Float.parseFloat(grossValue) - netto;
 								VATAmount = temp.toString();
+								int dotIndex = VATAmount.indexOf('.');
+								VATAmount =VATAmount.substring(0, dotIndex+2);
 							} catch (NumberFormatException e) {
 								VATAmount = grossValue.toString();
 								grossValue = netto.toString();
 							}
 
-							System.out.println("VATAmount " + VATAmount);
+							//System.out.println("VATAmount " + VATAmount);
 							contentStream.showText(set.getKey().toString());
 							contentStream.newLineAtOffset(0, -20);
-							contentStream.showText(VATAmount+" "+WindowApp.currValue);
+
+							switch(VATRate) {
+							case "0%":
+								contentStream.showText(VATAmount + " " + WindowApp.currValue+" ("+String.format("%,.2f", 0 * currExchRateVal)+" "+AverageExchangeRate.PLN_CODE+")");
+							break;
+							case "5%":
+								contentStream.showText(VATAmount + " " + WindowApp.currValue+" ("+ String.format("%,.2f", 5 * currExchRateVal)+" "+AverageExchangeRate.PLN_CODE+")");
+							break;
+							case "7%":
+								contentStream.showText(VATAmount + " " + WindowApp.currValue+" ("+ String.format("%,.2f", 7 * currExchRateVal)+" "+AverageExchangeRate.PLN_CODE+")");
+							break;
+							case "8%":
+								contentStream.showText(VATAmount + " " + WindowApp.currValue+" ("+String.format("%,.2f", 8 * currExchRateVal)+" "+AverageExchangeRate.PLN_CODE+")");
+							break;
+							case "23%":
+								contentStream.showText(VATAmount + " " + WindowApp.currValue+" ("+ String.format("%,.2f", 23 * currExchRateVal)+" "+AverageExchangeRate.PLN_CODE+")");
+							break;
+							default:
+								contentStream.showText(VATAmount + " " + WindowApp.currValue);
+							}
+							
+							
+							
+							
+							
+							//contentStream.showText(VATAmount + " " + WindowApp.currValue);
 							contentStream.newLineAtOffset(0, 20);
 							contentStream.newLineAtOffset(130, 0);
 
@@ -243,9 +279,13 @@ public class PDFCreator {
 						else if (set.getKey().equals("10.Gross value")) {
 							contentStream.showText(set.getKey().toString());
 							contentStream.newLineAtOffset(0, -20);
-							contentStream.showText(grossValue+" "+WindowApp.currValue);
+							contentStream.showText(grossValue + " " + WindowApp.currValue+"("+String.format("%,.2f",Double.parseDouble(grossValue)* currExchRateVal)+AverageExchangeRate.PLN_CODE+")");
 							contentStream.newLineAtOffset(0, 20);
 							contentStream.newLineAtOffset(130, 0);
+							
+
+							contentStream.newLineAtOffset(-650, -100);
+							contentStream.showText("Average Exchange Rate: "+ currExchRateVal);
 
 						} else {
 							contentStream.showText(set.getKey().toString());
@@ -261,7 +301,7 @@ public class PDFCreator {
 
 			} else {
 				/**
-				 * Second write.
+				 * Client data
 				 */
 				for (Map.Entry<String, String> set : ((Map<String, String>) object).entrySet()) {
 
@@ -298,6 +338,7 @@ public class PDFCreator {
 		try {
 
 			Float.parseFloat(userInput);
+			Double.parseDouble(userInput);
 			// localVariable = check.toString();
 			result = true;
 		} catch (NumberFormatException e) {

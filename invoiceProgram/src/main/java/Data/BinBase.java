@@ -22,6 +22,7 @@ public class BinBase {
             out.writeUTF(key);
             out.writeUTF(value);
             out.writeUTF("\n");
+            out.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
